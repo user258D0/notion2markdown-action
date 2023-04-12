@@ -118,6 +118,10 @@ async function download(page) {
   if (properties.urlname) filename = properties.urlname;
   let filepath = join(config.output, filename + ".md");
 
+  if (!path.existsSync(config.output)) {
+    fs.mkdirSync(config.output, 0744);
+  }
+  
   md = format(md, { parser: "markdown" });
   writeFileSync(filepath, md);
   return filepath;
