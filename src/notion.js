@@ -40,7 +40,7 @@ function init(conf) {
   notion = new Client({ auth: config.notion_secret });
 
   picgo.setConfig({
-    picBed: { uploader: "aliyun", current: "aliyun", aliyun: config.aliyun },
+    picBed: { uploader: "tcyun", current: "tcyun", tcyun: config.tcyun },
   });
 
   // 文件重命名为 md5
