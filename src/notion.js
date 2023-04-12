@@ -119,7 +119,10 @@ async function download(page) {
   let filepath = join(config.output, filename + ".md");
 
   if (!existsSync(config.output)) {
-    mkdirSync(config.output, true);
+    mkdirSync(config.output, { recursive: true });
+    console.log('Folder created successfully:', config.output);
+  } else {
+    console.log('Folder already exists:', config.output);
   }
   
   md = format(md, { parser: "markdown" });
