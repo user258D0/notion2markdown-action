@@ -21,7 +21,7 @@
 
 ```yaml
 inputs:
-  token:  # id of input
+  notion_secret:  # id of input
     description: notion app token，建议最好放到 Action Secret 中
     required: true
   database_id:
