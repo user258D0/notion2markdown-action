@@ -67,6 +67,7 @@ class NotionFileHandler extends FileHandler.default {
     for (const url of urls) {
       this.urlList[file][url] = url;
     }
+    console.log(`file: ${file}, urls: ${urls}`); 
   }
 }
 

@@ -74,6 +74,7 @@ async function sync() {
 }
 
 async function migrateImages(file) {
+  console.log(`handling file: ${file}`)
   let res = await Migrater(picgo, [file]);
   if (res.success != res.total)
     throw new Error(
