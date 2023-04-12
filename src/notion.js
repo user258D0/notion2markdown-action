@@ -119,7 +119,7 @@ async function download(page) {
   let filepath = join(config.output, filename + ".md");
 
   if (!path.existsSync(config.output)) {
-    fs.mkdirSync(config.output, 0744);
+    fs.mkdirSync(config.output, { recursive: true } );
   }
   
   md = format(md, { parser: "markdown" });
