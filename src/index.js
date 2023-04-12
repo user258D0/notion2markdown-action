@@ -5,13 +5,15 @@ let config = {
   notion_secret: core.getInput("notion_secret"),
   database_id: core.getInput("database_id"),
   migrate_image: core.getInput("migrate_image") === "true",
-  aliyun: {
-    accessKeyId: core.getInput("access_key_id"),
-    accessKeySecret: core.getInput("access_key_secret"),
+  tcyun: {
+    secretId: core.getInput("secretId"),
+    secretKey: core.getInput("secretKey"),
     bucket: core.getInput("bucket"),
+    appId: core.getInput("appId"),
     area: core.getInput("area"),
-    path: core.getInput("prefix"),
-    customUrl: "",
+    path: core.getInput("path"),
+    customUrl: core.getInput("customUrl"),
+    version: core.getInput("version"),
     options: "",
   },
   status: {
