@@ -87,11 +87,12 @@ jobs:
         notion_secret: ${{ secrets.NOTION_TOKEN }}
         database_id: "xxx"
         output: "./source/_posts/notion/"
-        access_key_id: "${{ secrets.ALI_ID }}"
-        access_key_secret: "${{ secrets.ALI_SECRET }}"
+        secretId: "${{ secrets.ALI_ID }}"
+        secretKey: "${{ secrets.ALI_SECRET }}"
         bucket: "xxx"
+        appId: ""
         area: "${{ inputs.oss_endpoint }}"
-        prefix: "image/"
+        path: "b/"
 
     - name: git setting
       run: |
