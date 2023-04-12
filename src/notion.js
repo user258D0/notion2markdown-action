@@ -1,5 +1,5 @@
 const { Client } = require("@notionhq/client");
-const { writeFileSync } = require("fs");
+const { writeFileSync, existsSync, mkdirSync } = require("fs");
 const { NotionToMarkdown } = require("notion-to-md");
 const { parse } = require("twemoji");
 const { getBlockChildren } = require("notion-to-md/build/utils/notion");
@@ -118,8 +118,8 @@ async function download(page) {
   if (properties.urlname) filename = properties.urlname;
   let filepath = join(config.output, filename + ".md");
 
-  if (!path.existsSync(config.output)) {
-    fs.mkdirSync(config.output, { recursive: true } );
+  if (!existsSync(config.output)) {
+    mkdirSync(config.output, true);
   }
   
   md = format(md, { parser: "markdown" });
