@@ -53,7 +53,7 @@ class NotionFileHandler extends FileHandler.default {
     let urls = markdownURLList.concat(imageTagURLList);
 
     // front matter
-    let matchs = content.matchAll(/(.*):\s((https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg|tif)))/gi);
+    let matchs = content.matchAll(/(.*):\s((https?:\/\/.*\.(?:png|jpg|jpeg|gif|svg|tif)).*)/gi);
     for (const m of matchs) {
       let src = m[2];
       src = src.replace(/^'/, "").replace(/'$/, "");
