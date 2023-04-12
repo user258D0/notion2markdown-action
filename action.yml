@@ -54,6 +54,9 @@ inputs:
   version:
     description: "tcyun cos version"
     default: "v5"
+  customUrl:
+    description: "tcyun cos customUrl"
+    default: ""
 
 runs:
   using: 'node16'
