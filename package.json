@@ -1,6 +1,6 @@
 {
-  "name": "notion-blog-action",
-  "version": "1.0.0",
+  "name": "notion-blog-action-tcyun",
+  "version": "0.1.8",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -10,9 +10,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@actions/core": "^1.6.0",
+    "@actions/core": "^1.10.0",
     "@actions/exec": "^1.1.0",
-    "@actions/github": "^5.0.0",
+    "@actions/github": "^5.1.1",
     "@notionhq/client": "^0.4.9",
     "adm-zip": "^0.5.9",
     "axios": "^0.24.0",

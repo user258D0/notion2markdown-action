@@ -20,8 +20,8 @@ let config = {
     bucket: "",
     appId: "",
     area: "",
-    path: "b/",
-    customUrl: "https://i.cuger.cn",
+    path: "",
+    customUrl: "",
     version: "v5"
   },
   status: {
