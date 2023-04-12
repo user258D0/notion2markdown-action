@@ -97,9 +97,12 @@ async function getPages(database_id) {
 async function published(page) {
   let props = page.properties;
   props[config.status.name].select = { name: config.status.published };
+  // only update the status property
+  let props_updated = {};
+  props_updated[config.status.name] = props[config.status.name];
   await notion.pages.update({
     page_id: page.id,
-    properties: props,
+    properties: props_updated,
   });
 }
 
