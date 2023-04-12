@@ -1,7 +1,7 @@
 name: 'notion-blog-action'
 description: |
   将 notion database 中的 page 转换为 markdown 文档，可以用于 hexo、hugo 等静态博客构建
-  支持自动将图片迁移到 aliyun oss
+  支持自动将图片迁移到 tcyun oss
 inputs:
   token:  # id of input
     description: notion app token，建议最好放到 Action Secret 中
@@ -25,29 +25,36 @@ inputs:
     default: "待发布"
   migrate_image:
     description: |
-      是否迁移图片到 aliyun oss
+      是否迁移图片到 tcyun oss
       注意: 如果不迁移图片默认导出图片链接是 notion 的自带链接，有访问时效
-      目前支持迁移图片到 aliyun oss 中
+      目前支持迁移图片到 tcyun oss 中
     default: "true"
   output:
     required: false
     description: 输出的文件夹路径
-  access_key_id:
-    description: aliyun access_key_id
+  secretId:
+    description: tcyun secretId
     required: true
-  access_key_secret:
-    description: aliyun access_key_secret
+  secretKey:
+    description: tcyun secretKey
     required: true
   bucket:
-    description: aliyun bucket
+    description: tcyun bucket
+    required: true
+  appId:
+    description: tcyun appId
     required: true
   area:
-    description: "aliyun area: oss-cn-hangzhou"
+    description: "tcyun area: oss-cn-hangzhou"
     required: true
     default: oss-cn-hangzhou
-  prefix:
+  path:
     description: "file dir, e.g. image/"
-  
+    default: ""
+  version:
+    description: "tcyun cos version"
+    default: "v5"
+
 runs:
   using: 'node16'
   main: 'dist/index.js'
