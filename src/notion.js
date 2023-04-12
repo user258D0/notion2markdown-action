@@ -14,14 +14,15 @@ let config = {
   notion_secret: "",
   database_id: "",
   migrate_image: true,
-  aliyun: {
-    accessKeyId: "",
-    accessKeySecret: "",
+  tcyun: {
+    secretId: "",
+    secretKey: "",
     bucket: "",
+    appId: "",
     area: "",
-    path: "",
-    customUrl: "",
-    options: "",
+    path: "b/",
+    customUrl: "https://i.cuger.cn",
+    version: "v5"
   },
   status: {
     name: "",
