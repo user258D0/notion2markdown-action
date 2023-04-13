@@ -1,5 +1,5 @@
 const { Client } = require("@notionhq/client");
-const { writeFileSync, existsSync, mkdirSync } = require("fs");
+const { writeFileSync, existsSync, mkdirSync, readFileSync } = require("fs");
 const { NotionToMarkdown } = require("notion-to-md");
 const { parse } = require("twemoji");
 const { getBlockChildren } = require("notion-to-md/build/utils/notion");
@@ -59,15 +59,19 @@ function init(conf) {
 }
 
 async function sync() {
-  // 获取待发布的文章
-  let pages = await getPages(config.database_id);
+  // 获取待发布和已发布的文章
+  let pages = await getPages(config.database_id, ["unpublish", "published"]);
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
 
     console.log(`[${i + 1}]: ${page.properties.title.title[0].plain_text}`);
-    let file = await download(page);
-    if(config.migrate_image) await migrateImages(file);
-    published(page);
+    const { filepath, properties, md } = await download(page);
+    if (config.migrate_image) await migrateImages(filepath);
+    if (properties.abbrlink && page.properties.hasOwnProperty('abbrlink') && !page.properties.abbrlink.type == 'text' && page.properties.abbrlink.plain_text != properties.abbrlink) {
+      // update the abbrlink for the page
+      page.properties.abbrlink.plain_text = properties.abbrlink;
+    }
+    updatePageProperties(page);
   }
   if (pages.length == 0)
     console.log(`no pages ${config.status.name}: ${config.status.unpublish}`);
@@ -82,25 +86,55 @@ async function migrateImages(file) {
     );
 }
 
-async function getPages(database_id) {
-  let resp = await notion.databases.query({
-    database_id: database_id,
-    filter: {
+async function getPages(database_id, types = ["unpublish", "published"]) {
+  let filter = {}
+  if (types.length > 1) {
+    filter = {
+      or: [
+        {
+          property: config.status.name,
+          select: {
+            equals: config.status.unpublish,
+          },
+        },
+        {
+          property: config.status.name,
+          select: {
+            equals: config.status.published,
+          },
+        },
+      ],
+    }
+  } else {
+    if (types.length == 0) types = ['unpublish'];
+    filter = {
       property: config.status.name,
       select: {
-        equals: config.status.unpublish,
+        equals: config.status[types[0]],
       },
-    },
+    }
+  }
+  // print the filter
+  console.log('Page filter:', filter);
+  let resp = await notion.databases.query({
+    database_id: database_id,
+    filter: filter,
   });
   return resp.results;
 }
 
-async function published(page) {
+async function updatePageProperties(page) {
   let props = page.properties;
   props[config.status.name].select = { name: config.status.published };
   // only update the status property
   let props_updated = {};
   props_updated[config.status.name] = props[config.status.name];
+  // update status and abbrlink if exists
+  for (keyNeedUpdate in ['abbrlink', config.status.name]) {
+    if (props.hasOwnProperty(keyNeedUpdate)) {
+      props_updated[keyNeedUpdate] = props[keyNeedUpdate];
+    }
+  }
   await notion.pages.update({
     page_id: page.id,
     properties: props_updated,
@@ -116,23 +150,65 @@ async function download(page) {
   let md = n2m.toMarkdownString(mdblocks);
 
   let properties = props(page);
-  fm = YAML.stringify(properties, { doubleQuotedAsJSON: true });
-  md = `---\n${fm}---\n\n${md}`;
-
+  // set the status to published for markdown file
+  properties.status = config.status.published;
+  // set filename for markdown file
   let filename = properties.title;
   if (properties.urlname) filename = properties.urlname;
   let filepath = join(config.output, filename + ".md");
-
+  // check if the folder exists
   if (!existsSync(config.output)) {
     mkdirSync(config.output, { recursive: true });
     console.log('Folder created successfully:', config.output);
   } else {
     console.log('Folder already exists:', config.output);
   }
+  // check if the file already exists
+  if (existsSync(filepath)) {
+    console.log('File already exists:', filepath);
+    // read the properties from the markdown file
+    const old_properties = await loadPropertiesFromMarkdownFile(filepath);
+    // old_properties 存在, 说明已经部署过, 只需要更新内容，更新properties中的abbrlink
+    if (old_properties && old_properties.abbrlink) {
+      // abbrlink 存在, 说明已经部署过, 只需要更新内容，更新properties中的abbrlink
+      console.log('File already deployed with abbrlink:', old_properties.abbrlink);
+      if (!properties.hasOwnProperty('abbrlink')) {
+        properties.abbrlink = old_properties.abbrlink;
+      }
+    }
+  } else {
+    mkdirSync(config.output, { recursive: true });
+    console.log('File created successfully:', filepath);
+  }
+
+  fm = YAML.stringify(properties, { doubleQuotedAsJSON: true });
+  // check if the file already exists
+  md = `---\n${fm}---\n\n${md}`;
   
   md = format(md, { parser: "markdown" });
   writeFileSync(filepath, md);
-  return filepath;
+  return {
+    filepath,
+    properties,
+    md
+  };
+}
+
+async function loadPropertiesFromMarkdownFile(filepath) {
+  // load properties from the markdown file
+  // check if the file already exists
+  if (!existsSync(filepath)) {
+    console.log('File does not exist:', filepath);
+    return null;
+  }
+  const content = readFileSync(filepath, 'utf8');
+  // math the front matter
+  const fm = content.match(/---\n([\s\S]*?)\n---/);
+  // parse the front matter
+  if (!fm) return null;
+  const properties = YAML.parse(fm[1]);
+  console.log('File properties:', properties);
+  return properties;
 }
 
 /**
