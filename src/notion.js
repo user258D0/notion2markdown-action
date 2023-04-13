@@ -63,15 +63,18 @@ async function sync() {
   let pages = await getPages(config.database_id, ["unpublish", "published"]);
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
-
+    console.log(`Handling page: ${page.id} [${i + 1}/${pages.length}]`);
+    console.log(`Page properties:`, page.properties);
     console.log(`[${i + 1}]: ${page.properties.title.title[0].plain_text}`);
     const { filepath, properties, md } = await download(page);
     if (config.migrate_image) await migrateImages(filepath);
-    if (properties.abbrlink && page.properties.hasOwnProperty('abbrlink') && !page.properties.abbrlink.type == 'text' && page.properties.abbrlink.plain_text != properties.abbrlink) {
+    if (properties.abbrlink && page.properties.hasOwnProperty('abbrlink') && !page.properties.abbrlink.type == 'rich_text' && page.properties.abbrlink.rich_text[0].plain_text != properties.abbrlink) {
       // update the abbrlink for the page
-      page.properties.abbrlink.plain_text = properties.abbrlink;
+      page.properties.abbrlink.rich_text[0].plain_text = properties.abbrlink;
+      page.properties.abbrlink.rich_text[0].text.content = properties.abbrlink;
     }
     updatePageProperties(page);
+    console.log(`Page updated: ${page.id}`);
   }
   if (pages.length == 0)
     console.log(`no pages ${config.status.name}: ${config.status.unpublish}`);
@@ -135,6 +138,7 @@ async function updatePageProperties(page) {
       props_updated[keyNeedUpdate] = props[keyNeedUpdate];
     }
   }
+  console.log('Page properties updated:', props_updated);
   await notion.pages.update({
     page_id: page.id,
     properties: props_updated,
