@@ -28,15 +28,13 @@ jobs:
           npm install
           npm i -g @vercel/ncc
           npm run build
+      - name: Commit & Push
+        uses: stefanzweifel/git-auto-commit-action@v4
+        with: 
+          commit_message: Automatic build.
       - name: Create release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           automatic_release_tag: latest
-          files: |
-            dist/*
-            docs/*
-            src/*
-            *.json
-            *.md
