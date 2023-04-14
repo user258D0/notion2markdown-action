@@ -23,6 +23,7 @@ jobs:
       - name: Build a release
         run: |
           npm install
+          npm i -g @vercel/ncc
           npm run build
       - name: Commit & Push
         uses: stefanzweifel/git-auto-commit-action@v4
