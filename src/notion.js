@@ -72,9 +72,9 @@ async function sync() {
       page.properties[config.status.name].select = { name: config.status.published };
     }
     // get the filename and filepath of the markwon file
-    let properties = getPropertiesDict(page.properties);
+    let properties = getPropertiesDict(page);
     console.log(`Page properties dict:`, properties);
-    const filename = properties.urlname ? properties.urlname + '.md' : page.title + '.md';
+    const filename = properties.filename ? properties.filename + '.md' : page.title + '.md';
     // get the filepath, and old properties of the page from the markdown file
     const filePath = join(config.output, filename);
     // check if the file exists
