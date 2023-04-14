@@ -1,6 +1,6 @@
 {
   "name": "notion-blog-action-tcyun",
-  "version": "0.2.3",
+  "version": "0.2.6",
   "description": "",
   "main": "index.js",
   "scripts": {
