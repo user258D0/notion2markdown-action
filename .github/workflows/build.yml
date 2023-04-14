@@ -23,15 +23,6 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node_version }}
-      - name: Build sinlge file
-        run: |
-          npm install
-          npm i -g @vercel/ncc
-          npm run build
-      - name: Commit & Push
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with: 
-          commit_message: Automatic build.
       - name: Create release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
