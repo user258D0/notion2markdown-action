@@ -66,20 +66,69 @@ async function sync() {
     console.log(`Handling page: ${page.id} [${i + 1}/${pages.length}]`);
     console.log(`Page properties:`, page.properties);
     console.log(`[${i + 1}]: ${page.properties.title.title[0].plain_text}`);
-    const { filepath, properties, md } = await download(page);
-    if (config.migrate_image) await migrateImages(filepath);
-    if (properties.abbrlink && page.properties.hasOwnProperty('abbrlink') && !page.properties.abbrlink.type == 'rich_text' && page.properties.abbrlink.rich_text[0].plain_text != properties.abbrlink) {
-      // update the abbrlink for the page
-      page.properties.abbrlink.rich_text[0].plain_text = properties.abbrlink;
-      page.properties.abbrlink.rich_text[0].text.content = properties.abbrlink;
+    // check if the page is unpublished, change it to published
+    if (page.properties[config.status.name].select.name == config.status.unpublish) {
+      console.log(`Page status is ${config.status.name}: ${config.status.unpublish}, change to published.`);
+      page.properties[config.status.name].select = { name: config.status.published };
     }
-    updatePageProperties(page);
+    // get the filename and filepath of the markwon file
+    let properties = getPropertiesDict(page.properties);
+    console.log(`Page properties dict:`, properties);
+    const filename = properties.urlname ? properties.urlname + '.md' : page.title + '.md';
+    // get the filepath, and old properties of the page from the markdown file
+    const filePath = join(config.output, filename);
+    // check if the file exists
+    if (existsSync(filePath)) {
+      console.log(`File exists: ${filePath}`);
+      const oldProperties = await loadPropertiesFromMarkdownFile(filePath);
+      console.log(`Markdown file properties:`, old_propoldPropertiesrties);
+      // skip if the page is published and the updated time is not changed
+      if (properties[config.status.name] == config.status.published && oldProperties.updated == properties.updated) {
+        console.log(`Page is published and the updated time is not changed, skip it.`);
+        continue;
+      }
+      // update the abbrlink for the page of nation, if it exists in the markdown file
+      if (properties.hasOwnProperty('abbrlink') && oldProperties.abbrlink) {
+        // update the abbrlink for the page
+        page.properties.abbrlink.rich_text[0].plain_text = oldProperties.abbrlink;
+        page.properties.abbrlink.rich_text[0].text.content = oldProperties.abbrlink;
+      }
+    } else {
+      console.log(`File not exists: ${filePath}, it's a new page.`);
+      mkdirSync(filePath, { recursive: true });
+    }
+    console.log(`Finnal properties for markdown file:`, properties);
+    // tranform the page of nation to markdown
+    await page2Markdown(page, filePath, properties);
+    if (config.migrate_image) await migrateImages(filePath);
+    // update the page status to published
+    await updatePageProperties(page);
     console.log(`Page updated: ${page.id}`);
   }
   if (pages.length == 0)
     console.log(`no pages ${config.status.name}: ${config.status.unpublish}`);
 }
 
+/**
+ * featch page from notion, and convert it to local markdown file
+ * @param {*} page 
+ * @param {*} filePath 
+ * @param {*} properties 
+ */
+
+async function page2Markdown(page, filePath, properties) {
+  const mdblocks = await n2m.pageToMarkdown(page.id);
+  let md = n2m.toMarkdownString(mdblocks);
+  fm = YAML.stringify(properties, { doubleQuotedAsJSON: true });
+  // check if the file already exists
+  md = format(`---\n${fm}---\n\n${md}`, { parser: "markdown" });
+  writeFileSync(filePath, md);
+}
+
+/**
+ * migrate images of the markdown file to tcyun
+ * @param {*} file 
+ */
 async function migrateImages(file) {
   console.log(`handling file: ${file}`)
   let res = await Migrater(picgo, [file]);
@@ -89,6 +138,12 @@ async function migrateImages(file) {
     );
 }
 
+/**
+ * query the pages of the database
+ * @param {*} database_id 
+ * @param {*} types 
+ * @returns 
+ */
 async function getPages(database_id, types = ["unpublish", "published"]) {
   let filter = {}
   if (types.length > 1) {
@@ -126,6 +181,10 @@ async function getPages(database_id, types = ["unpublish", "published"]) {
   return resp.results;
 }
 
+/**
+ * update the page status to published, and update the abbrlink if exists
+ * @param {*} page 
+ */
 async function updatePageProperties(page) {
   let props = page.properties;
   props[config.status.name].select = { name: config.status.published };
@@ -146,57 +205,10 @@ async function updatePageProperties(page) {
 }
 
 /**
- * 下载一篇文章
- * @param {*} page
+ * load properties from the markdown file
+ * @param {*} filepath 
+ * @returns 
  */
-async function download(page) {
-  const mdblocks = await n2m.pageToMarkdown(page.id);
-  let md = n2m.toMarkdownString(mdblocks);
-
-  let properties = props(page);
-  // set the status to published for markdown file
-  properties.status = config.status.published;
-  // set filename for markdown file
-  let filename = properties.title;
-  if (properties.urlname) filename = properties.urlname;
-  let filepath = join(config.output, filename + ".md");
-  // check if the folder exists
-  if (!existsSync(config.output)) {
-    mkdirSync(config.output, { recursive: true });
-    console.log('Folder created successfully:', config.output);
-  } else {
-    console.log('Folder already exists:', config.output);
-  }
-  // check if the file already exists
-  if (existsSync(filepath)) {
-    console.log('File already exists:', filepath);
-    // read the properties from the markdown file
-    const old_properties = await loadPropertiesFromMarkdownFile(filepath);
-    // old_properties 存在, 说明已经部署过, 只需要更新内容，更新properties中的abbrlink
-    if (old_properties && old_properties.abbrlink) {
-      // abbrlink 存在, 说明已经部署过, 只需要更新内容，更新properties中的abbrlink
-      console.log('File already deployed with abbrlink:', old_properties.abbrlink);
-      if (!properties.hasOwnProperty('abbrlink')) {
-        properties.abbrlink = old_properties.abbrlink;
-      }
-    }
-  } else {
-    mkdirSync(config.output, { recursive: true });
-    console.log('File created successfully:', filepath);
-  }
-
-  fm = YAML.stringify(properties, { doubleQuotedAsJSON: true });
-  // check if the file already exists
-  md = `---\n${fm}---\n\n${md}`;
-  
-  md = format(md, { parser: "markdown" });
-  writeFileSync(filepath, md);
-  return {
-    filepath,
-    properties,
-    md
-  };
-}
 
 async function loadPropertiesFromMarkdownFile(filepath) {
   // load properties from the markdown file
@@ -220,7 +232,7 @@ async function loadPropertiesFromMarkdownFile(filepath) {
  * @param {*} page
  * @returns {Object}
  */
-function props(page) {
+function getPropertiesDict(page) {
   let data = {};
   for (const key in page.properties) {
     data[key] = getPropVal(page.properties[key]);

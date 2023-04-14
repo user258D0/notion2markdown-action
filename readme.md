@@ -1,4 +1,4 @@
-# notion blog action
+# notion blog action - tcyun
 
 将 notion database 中的文章转换为 markdown 文件，提供给 hexo、hugo 等静态博客使用
 
@@ -80,8 +80,8 @@ inputs:
     description: "tcyun cos customUrl"
     default: ""
 ```
-  
-  #### 配置示例
+
+#### 配置示例
 
 ```yaml
 on: [repository_dispatch, watch]
