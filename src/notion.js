@@ -81,7 +81,7 @@ async function sync() {
     if (existsSync(filePath)) {
       console.log(`File exists: ${filePath}`);
       const oldProperties = await loadPropertiesFromMarkdownFile(filePath);
-      console.log(`Markdown file properties:`, old_propoldPropertiesrties);
+      console.log(`Markdown file properties:`, oldProperties);
       // skip if the page is published and the updated time is not changed
       if (properties[config.status.name] == config.status.published && oldProperties.updated == properties.updated) {
         console.log(`Page is published and the updated time is not changed, skip it.`);
