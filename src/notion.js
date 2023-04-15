@@ -101,6 +101,7 @@ async function sync() {
         } else {
           page.properties.abbrlink.rich_text[0] = text;
         }
+        console.log(`Page abbrlink updated: ${abbrlink}`);
       }
     } else {
       console.log(`File not exists: ${filePath}, it's a new page.`);
