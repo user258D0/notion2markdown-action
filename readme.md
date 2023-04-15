@@ -51,9 +51,14 @@ inputs:
       注意: 如果不迁移图片默认导出图片链接是 notion 的自带链接，有访问时效
       目前支持迁移图片到 tcyun oss 中
     default: "true"
-  output:
+  page_output_dir:
     required: false
-    description: 输出的文件夹路径
+    description: page类型页面的输出文件夹
+    default: "source/"
+  post_output_dir:
+    required: false
+    description: post类型页面的输出文件夹
+    default: "source/_posts/notion"
   secretId:
     description: tcyun secretId
     required: true
@@ -79,6 +84,7 @@ inputs:
   customUrl:
     description: "tcyun cos customUrl"
     default: ""
+
 ```
 
 #### 配置示例
@@ -100,7 +106,6 @@ jobs:
       with:
         notion_secret: ${{ secrets.NOTION_TOKEN }}
         database_id: "xxx"
-        output: "./source/_posts/notion/"
         secretId: "${{ secrets.ALI_ID }}"
         secretKey: "${{ secrets.ALI_SECRET }}"
         bucket: "xxx"

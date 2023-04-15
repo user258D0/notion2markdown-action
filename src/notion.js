@@ -29,7 +29,8 @@ let config = {
     unpublish: "",
     published: "",
   },
-  output: "",
+  page_output_dir: "",
+  post_output_dir: "",
 };
 
 let notion = new Client({ auth: config.notion_secret });
@@ -99,9 +100,17 @@ async function sync() {
     // get the filename and filepath of the markwon file
     let properties = getPropertiesDict(page);
     console.log(`Page properties dict:`, properties);
-    const filename = properties.filename ? properties.filename + '.md' : page.title + '.md';
+    // add support for the both page and post
+    var filename = properties.filename ? properties.filename + ".md" : page.title + ".md";
+    var output_dir = config.post_output_dir;
+    if (properties.type == "page") {
+      // page
+      filename = 'index.md';
+      output_dir = join(config.page_output_dir, properties.filename);
+    }
+    // const filename = properties.filename ? properties.filename + '.md' : page.title + '.md';
     // get the filepath, and old properties of the page from the markdown file
-    const filePath = join(config.output, filename);
+    const filePath = join(output_dir, filename);
     // check if the file exists
     if (existsSync(filePath)) {
       console.log(`File exists: ${filePath}`);
