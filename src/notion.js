@@ -90,8 +90,17 @@ async function sync() {
       // update the abbrlink for the page of nation, if it exists in the markdown file
       if (properties.hasOwnProperty('abbrlink') && oldProperties.abbrlink) {
         // update the abbrlink for the page
-        page.properties.abbrlink.rich_text[0].plain_text = oldProperties.abbrlink;
-        page.properties.abbrlink.rich_text[0].text.content = oldProperties.abbrlink;
+        const abbrlink = oldProperties.abbrlink;
+        const text = {
+          type: 'text',
+          plain_text: abbrlink,
+          text: { content: abbrlink }
+        }
+        if (page.properties.abbrlink.rich_text.length == 0) {
+          page.properties.abbrlink.rich_text.push(text);
+        } else {
+          page.properties.abbrlink.rich_text[0] = text;
+        }
       }
     } else {
       console.log(`File not exists: ${filePath}, it's a new page.`);
