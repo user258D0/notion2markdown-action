@@ -1,5 +1,5 @@
 const { Client } = require("@notionhq/client");
-const { writeFileSync, existsSync, mkdirSync, readFileSync } = require("fs");
+const { writeFileSync, existsSync, mkdirSync, readFileSync, readdirSync } = require("fs");
 const { NotionToMarkdown } = require("notion-to-md");
 const { parse } = require("twemoji");
 const { getBlockChildren } = require("notion-to-md/build/utils/notion");
@@ -69,22 +69,15 @@ async function sync() {
     return properties;
   });
   // query the filename list from the output directory
-  fs.readdir(config.output, (err, files) => {
-    if (err) {
-      console.log(err);
-      return;
-    }
-    // remove the file not exists in the pages
-    files.forEach((file) => {
-      if (file.endsWith(".md")) {
-        // check if the file exists in the pages
-        if (!notion_page_prop_list.some((page) => page.filename == file)) {
-          // remove the file
-          fs.unlinkSync(join(config.output, file));
-          console.log(`File ${file} removed.`);
-        }
+  readdirSync(config.output).forEach((file) => {
+    if (file.endsWith(".md")) {
+      // check if the file exists in the pages
+      if (!notion_page_prop_list.some((page) => page.filename == file)) {
+        // remove the file
+        fs.unlinkSync(join(config.output, file));
+        console.log(`File ${file} removed.`);
       }
-    });
+    }
   });
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
