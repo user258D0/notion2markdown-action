@@ -110,6 +110,8 @@ async function sync() {
       console.log(`File not exists: ${filePath}, it's a new page.`);
       mkdirSync(filePath, { recursive: true });
     }
+    // get the properties of the page
+    properties = getPropertiesDict(page);
     console.log(`Finnal properties for markdown file:`, properties);
     // tranform the page of nation to markdown
     await page2Markdown(page, filePath, properties);
@@ -200,8 +202,9 @@ async function getPages(database_id, types = ["unpublish", "published"]) {
  */
 async function updatePageProperties(page) {
   let props = page.properties;
-  props[config.status.name].select = { name: config.status.published };
+  // props[config.status.name].select = { name: config.status.published };
   // only update the status property
+  console.log('Page full properties updated:', props);
   let props_updated = {};
   props_updated[config.status.name] = props[config.status.name];
   // update status and abbrlink if exists
@@ -210,7 +213,7 @@ async function updatePageProperties(page) {
       props_updated[keyNeedUpdate] = props[keyNeedUpdate];
     }
   }
-  console.log('Page properties updated:', props_updated);
+  console.log('Page properties updated keys:', props_updated);
   await notion.pages.update({
     page_id: page.id,
     properties: props_updated,
@@ -236,7 +239,7 @@ async function loadPropertiesFromMarkdownFile(filepath) {
   // parse the front matter
   if (!fm) return null;
   const properties = YAML.parse(fm[1]);
-  console.log('File properties:', properties);
+  // console.log('File properties:', properties);
   return properties;
 }
 
