@@ -21,7 +21,8 @@ let config = {
     unpublish: core.getInput("status_unpublish"),
     published: core.getInput("status_published"),
   },
-  output: core.getInput("output"),
+  page_output_dir: core.getInput("page_output_dir"),
+  post_output_dir: core.getInput("post_output_dir"),
 };
 
 (async function () {
