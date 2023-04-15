@@ -61,12 +61,42 @@ function init(conf) {
 async function sync() {
   // 获取待发布和已发布的文章
   let pages = await getPages(config.database_id, ["unpublish", "published"]);
+  // get all the output markdown filename list of the pages, and remove the file not exists in the pages under the output directory
+  // query the filename list from the output directory
+  const notion_page_prop_list = pages.map((page) => {
+    var properties = getPropertiesDict(page);
+    properties.filename = properties.filename ? properties.filename + ".md" : page.title + ".md";
+    return properties;
+  });
+  // query the filename list from the output directory
+  fs.readdir(config.output, (err, files) => {
+    if (err) {
+      console.log(err);
+      return;
+    }
+    // remove the file not exists in the pages
+    files.forEach((file) => {
+      if (file.endsWith(".md")) {
+        // check if the file exists in the pages
+        if (!notion_page_prop_list.some((page) => page.filename == file)) {
+          // remove the file
+          fs.unlinkSync(join(config.output, file));
+          console.log(`File ${file} removed.`);
+        }
+      }
+    });
+  });
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
     console.log(`Handling page: ${page.id} [${i + 1}/${pages.length}]`);
     console.log(`Page properties:`, page.properties);
     console.log(`[${i + 1}]: ${page.properties.title.title[0].plain_text}`);
     var pageNeedUpdate = false;
+    // only handle the page ubpublished
+    if (page.properties[config.status.name].select.name != config.status.unpublish) {
+      console.log(`Page status is ${config.status.name}: ${page.properties[config.status.name].select.name}, skip it.`);
+      continue;
+    }
     // check if the page is unpublished, change it to published
     if (page.properties[config.status.name].select.name == config.status.unpublish) {
       console.log(`Page status is ${config.status.name}: ${config.status.unpublish}, change to published.`);
