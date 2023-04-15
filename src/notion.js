@@ -201,18 +201,15 @@ async function getPages(database_id, types = ["unpublish", "published"]) {
  * @param {*} page 
  */
 async function updatePageProperties(page) {
-  let props = page.properties;
-  // props[config.status.name].select = { name: config.status.published };
   // only update the status property
-  console.log('Page full properties updated:', props);
+  console.log('Page full properties updated:', page.properties);
   let props_updated = {};
-  props_updated[config.status.name] = props[config.status.name];
   // update status and abbrlink if exists
-  for (keyNeedUpdate in ['abbrlink', config.status.name]) {
-    if (props[keyNeedUpdate]) {
-      props_updated[keyNeedUpdate] = props[keyNeedUpdate];
+  [config.status.name, 'abbrlink'].forEach(key => {
+    if (page.properties[key]) {
+      props_updated[key] = page.properties[key];
     }
-  }
+  });
   console.log('Page properties updated keys:', props_updated);
   await notion.pages.update({
     page_id: page.id,
