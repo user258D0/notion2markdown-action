@@ -90,7 +90,7 @@ async function sync() {
         continue;
       }
       // update the abbrlink for the page of nation, if it exists in the markdown file
-      if (properties.hasOwnProperty('abbrlink') && oldProperties.abbrlink) {
+      if (properties.hasOwnProperty('abbrlink') && oldProperties.abbrlink && oldProperties.abbrlink != properties.abbrlink) {
         // update the abbrlink for the page
         const abbrlink = oldProperties.abbrlink;
         const text = {
