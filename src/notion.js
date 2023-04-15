@@ -237,6 +237,9 @@ function getPropertiesDict(page) {
   for (const key in page.properties) {
     data[key] = getPropVal(page.properties[key]);
   }
+  // created, updated time
+  data.created = page.created_time;
+  data.updated = page.last_edited_time;
   return data;
 }
 
