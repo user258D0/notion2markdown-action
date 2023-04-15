@@ -209,7 +209,7 @@ async function updatePageProperties(page) {
   props_updated[config.status.name] = props[config.status.name];
   // update status and abbrlink if exists
   for (keyNeedUpdate in ['abbrlink', config.status.name]) {
-    if (props.hasOwnProperty(keyNeedUpdate)) {
+    if (props[keyNeedUpdate]) {
       props_updated[keyNeedUpdate] = props[keyNeedUpdate];
     }
   }
