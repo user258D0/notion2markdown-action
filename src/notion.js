@@ -237,9 +237,17 @@ function getPropertiesDict(page) {
   for (const key in page.properties) {
     data[key] = getPropVal(page.properties[key]);
   }
+  // cover image
+  if (page.cover) {
+    if (page.cover.type === "external") {
+      data['cover'] = page.cover.external.url;
+    } else if (page.cover.type === "file") {
+      data['cover'] = page.cover.file.url;
+    }
+  }
   // created, updated time
-  data.created = page.created_time;
-  data.updated = page.last_edited_time;
+  data['created'] = page.created_time;
+  data['updated'] = page.last_edited_time;
   return data;
 }
 
