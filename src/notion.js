@@ -70,7 +70,7 @@ async function sync() {
     return properties;
   });
   // query the filename list from the output directory
-  readdirSync(config.output).forEach((file) => {
+  readdirSync(config.post_output_dir).forEach((file) => {
     if (file.endsWith(".md")) {
       // check if the file exists in the pages
       if (!notion_page_prop_list.some((page) => page.filename == file)) {
