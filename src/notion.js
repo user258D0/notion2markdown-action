@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-12 18:38:51 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-16 19:46:54 +02:00
+ * @LastEditTime: 2023-04-16 19:55:16 +02:00
  * @FilePath: \src\notion.js
  * @Description: 
  * 
@@ -148,7 +148,8 @@ async function sync() {
     console.log("No page to deal with.");
     return;
   }
-  notionPagePropList.forEach(async (prop) => {
+  // 同步处理文章, 提高速度
+  const results = await Promise.all(notionPagePropList.map(async (prop) => {
     let page = pages.find((page) => page.id == prop.id);
     console.log(`Handle page: ${prop.id}, ${prop.title}`);
     /**
@@ -157,7 +158,7 @@ async function sync() {
     // skip the page if it is not exists or published
     if (!page || prop[config.status.name] == config.status.published) {
       console.log(`Page is not exists or published, skip: ${prop.id}, ${prop.title}`);
-      return;
+      return false;
     }
     /**
      * 对于已发布的文章，如果本地文件存在，且存在abbrlink，则更新notion中的abbrlink
@@ -182,8 +183,9 @@ async function sync() {
     // update the page status to published
     await updatePageProperties(page);
     console.log(`Page conversion successfully: ${prop.id}, ${prop.title}`);
-  });
-  console.log("All pages are handled, ${notionPagePropList.length} pages are handled.");
+    return true;
+  }));
+  console.log(`All pages are handled, ${notionPagePropList.length} pages are handled, ${results.filter((r) => r).length} pages are updated.`);
 }
 
 /**
