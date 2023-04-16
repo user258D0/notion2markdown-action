@@ -60,7 +60,7 @@ async function sync() {
   // query the filename list from the output directory
   const notion_page_prop_list = pages.map((page) => {
     var properties = getPropertiesDict(page);
-    properties.filename = properties.filename ? properties.filename + ".md" : page.title + ".md";
+    properties.filename = properties.filename != undefined && properties ? properties.filename + ".md" : page.title + ".md";
     return properties;
   });
   // query the filename list from the output directory
