@@ -1,5 +1,5 @@
 const { Client } = require("@notionhq/client");
-const { writeFileSync, existsSync, mkdirSync, readFileSync, readdirSync } = require("fs");
+const { writeFileSync, existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync } = require("fs");
 const { NotionToMarkdown } = require("notion-to-md");
 const { parse } = require("twemoji");
 const { getBlockChildren } = require("notion-to-md/build/utils/notion");
@@ -73,7 +73,7 @@ async function sync() {
         // find the file need to be removed: not exists in the pages, or the status is not published
         if (!notion_page_prop_list.some((page) => page.filename == file && page[config.status.name] == config.status.published)) {
           // remove the file
-          fs.unlinkSync(join(config.output_dir.post, file));
+          unlinkSync(join(config.output_dir.post, file));
           console.log(`File ${file} removed.`);
         }
       }
