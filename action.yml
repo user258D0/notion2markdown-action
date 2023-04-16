@@ -1,7 +1,6 @@
 name: 'notion2markdown-action'
 description: |
-  将 notion database 中的 page 转换为 markdown 文档，可以用于 hexo、hugo 等静态博客构建, 内置picgo-core, 使用picBed作为图传上传方式。
-  支持图床：SMMS/QINIU/UPYUN/TCYUN/GITHUB/ALIYUN/IMGUR.
+  将 notion database 中的 page 转换为 markdown 文档，可以用于 hexo、hugo 等静态博客构建, 内置picgo-core,使用picBed上传图床。
 inputs:
   notion_secret:  # id of input
     description: notion app token，建议最好放到 Action Secret 中
