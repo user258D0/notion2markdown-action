@@ -39,7 +39,7 @@ let config = {
   output_dir: {
     page: core.getInput("page_output_dir"),
     post: core.getInput("post_output_dir"),
-    only_remain_published: core.getInput("clean_unpublished_post") === "true",
+    clean_unpublished_post: core.getInput("clean_unpublished_post") === "true",
   },
 };
 
