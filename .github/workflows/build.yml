@@ -23,11 +23,6 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
-      - name: Build dist
-        run: |
-          npm install
-          npm i -g @vercel/ncc
-          npm run build
       - name: Create release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
