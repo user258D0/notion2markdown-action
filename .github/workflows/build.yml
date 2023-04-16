@@ -29,7 +29,3 @@ jobs:
           repo_token: "${{ secrets.GITHUB_TOKEN }}"
           prerelease: false
           automatic_release_tag: latest
-  test:
-    name: Test the action
-    needs: build
-    uses: Doradx/notion2markdown-action/.github/workflows/test.yml@main
