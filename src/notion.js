@@ -64,7 +64,7 @@ async function sync() {
   });
   // query the filename list from the output directory
   if (!existsSync(config.output_dir.post)) {
-    mkdirSync(config.output_dir.post);
+    mkdirSync(config.output_dir.post, { recursive: true });
   } else {
     readdirSync(config.output_dir.post).forEach((file) => {
       if (file.endsWith(".md")) {
