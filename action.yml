@@ -25,13 +25,13 @@ inputs:
   migrate_image:
     required: false
     description: |
-      是否迁移图片到 tcyun oss
+      是否迁移图片到图床
       注意: 如果不迁移图片默认导出图片链接是 notion 的自带链接，有访问时效
-      目前支持迁移图片到 tcyun oss 中
+      目前支持迁移图片到多类图床中，采用的是PicGO-Core.
     default: "true"
   picBedConfig: 
     description: |
-      picgo-core中picBed配置文件, 支持类图床。
+      picgo-core中picBed配置文件, 支持多类型图床。
       example:
       ```
       "current": "smms",
