@@ -137,7 +137,7 @@ async function sync() {
       }
     } else {
       console.log(`File not exists: ${filePath}, it's a new page.`);
-      mkdirSync(filePath, { recursive: true });
+      mkdirSync(output_dir, { recursive: true });
     }
     // get the properties of the page
     properties = getPropertiesDict(page);
