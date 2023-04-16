@@ -1,3 +1,13 @@
+/*
+ * @Author: Dorad, ddxi@qq.com
+ * @Date: 2023-04-12 18:38:51 +02:00
+ * @LastEditors: Dorad, ddxi@qq.com
+ * @LastEditTime: 2023-04-16 19:46:54 +02:00
+ * @FilePath: \src\notion.js
+ * @Description: 
+ * 
+ * Copyright (c) 2023 by Dorad (ddxi@qq.com), All Rights Reserved.
+ */
 const { Client } = require("@notionhq/client");
 const { writeFileSync, existsSync, mkdirSync, readFileSync, readdirSync, unlinkSync } = require("fs");
 const { NotionToMarkdown } = require("notion-to-md");
@@ -56,103 +66,124 @@ function init(conf) {
 async function sync() {
   // 获取待发布和已发布的文章
   let pages = await getPages(config.database_id, ["unpublish", "published"]);
+  /**
+   * 需要处理的逻辑:
+   * 1. 对于已发布的文章，如果本地文件存在，且存在abbrlink，则更新notion中的abbrlink
+   * 2. 对于未发布的文章, 如果本地文件存在，则尝试读取本地文件的abbrlink，如果存在，则更新notion中的abbrlink, 并生成markdown文件
+   */
   // get all the output markdown filename list of the pages, and remove the file not exists in the pages under the output directory
   // query the filename list from the output directory
-  const notion_page_prop_list = pages.map((page) => {
-    var properties = getPropertiesDict(page);
-    properties.filename = properties.filename != undefined && properties ? properties.filename + ".md" : page.title + ".md";
+  const notionPagePropList = await Promise.all(pages.map(async (page) => {
+    var properties = await getPropertiesDict(page);
+    switch (properties.type) {
+      case "page":
+        if (!properties.filename) {
+          console.error(`Page ${properties.title} has no filename, the page id will be used as the filename.`);
+          properties.filename = properties.id;
+        }
+        properties.filePath = join(config.output_dir.page, properties.filename, 'index.md');
+        properties.output_dir = join(config.output_dir.page, properties.filename);
+        properties.filename = "index.md";
+        break;
+      case "post":
+      default:
+        properties.filename = properties.filename != undefined && properties.filename ? properties.filename + ".md" : properties.title + ".md";
+        properties.filePath = join(config.output_dir.post, properties.filename);
+        properties.output_dir = config.output_dir.post;
+    }
     return properties;
-  });
-  // query the filename list from the output directory
+  }));
+  console.log(`${notionPagePropList.length} pages found in notion.`);
+  // make the output directory if it is not exists
   if (!existsSync(config.output_dir.post)) {
     mkdirSync(config.output_dir.post, { recursive: true });
-  } else if (config.output_dir.clean_unpublished_post) {
-    // remove the file not published
-    readdirSync(config.output_dir.post).forEach((file) => {
-      if (file.endsWith(".md")) {
-        // find the file need to be removed: not exists in the pages, or the status is not published
-        if (!notion_page_prop_list.some((page) => page.filename == file && page[config.status.name] == config.status.published)) {
-          // remove the file
-          unlinkSync(join(config.output_dir.post, file));
-          console.log(`File ${file} removed.`);
-        }
-      }
-    });
   }
-  for (let i = 0; i < pages.length; i++) {
-    const page = pages[i];
-    console.log(`Handling page: ${page.id} [${i + 1}/${pages.length}]`);
-    console.log(`Page properties:`, page.properties);
-    console.log(`[${i + 1}]: ${page.properties.title.title[0].plain_text}`);
-    var pageNeedUpdate = false;
-    // only handle the page ubpublished
-    if (page.properties[config.status.name].select.name != config.status.unpublish) {
-      console.log(`Page status is ${config.status.name}: ${page.properties[config.status.name].select.name}, skip it.`);
+  if (!existsSync(config.output_dir.page)) {
+    mkdirSync(config.output_dir.page, { recursive: true });
+  }
+  /**
+   * 1. 删除notion中不存在的文章
+   * 2. 更新notion中已发布的文章的abbrlink
+   *  */
+  // load page properties from the markdown file
+  const localPostFileList = readdirSync(config.output_dir.post);
+  for (let i = 0; i < localPostFileList.length; i++) {
+    const file = localPostFileList[i];
+    if (!file.endsWith(".md")) {
+      return;
+    }
+    var localProp = loadPropertiesAndContentFromMarkdownFile(join(config.output_dir.post, file));
+    if (!localProp) {
       continue;
     }
-    // check if the page is unpublished, change it to published
-    if (page.properties[config.status.name].select.name == config.status.unpublish) {
-      console.log(`Page status is ${config.status.name}: ${config.status.unpublish}, change to published.`);
-      page.properties[config.status.name].select = { name: config.status.published };
-      pageNeedUpdate = true;
+    var page = pages.find((page) => page.id == localProp.id);
+    // if the page is not exists, delete the local file
+    if (!page && config.output_dir.clean_unpublished_post) {
+      console.log(`Page is not exists, delete the local file: ${file}`);
+      unlinkSync(join(config.output_dir.post, file));
+      return;
     }
-    // get the filename and filepath of the markwon file
-    let properties = getPropertiesDict(page);
-    console.log(`Page properties dict:`, properties);
-    // add support for the both page and post
-    var filename = properties.filename ? properties.filename + ".md" : page.title + ".md";
-    var output_dir = config.output_dir.post;
-    if (properties.type == "page") {
-      // page
-      filename = 'index.md';
-      output_dir = join(config.output_dir.page, properties.filename);
-    }
-    // const filename = properties.filename ? properties.filename + '.md' : page.title + '.md';
-    // get the filepath, and old properties of the page from the markdown file
-    const filePath = join(output_dir, filename);
-    // check if the file exists
-    if (existsSync(filePath)) {
-      console.log(`File exists: ${filePath}`);
-      const oldProperties = await loadPropertiesFromMarkdownFile(filePath);
-      console.log(`Markdown file properties:`, oldProperties);
-      // skip if the page is published and the updated time is not changed
-      if (properties[config.status.name] == config.status.published && oldProperties.updated == properties.updated) {
-        console.log(`Page is published and the updated time is not changed, skip it.`);
-        continue;
-      }
-      // update the abbrlink for the page of nation, if it exists in the markdown file
-      if (properties.hasOwnProperty('abbrlink') && oldProperties.abbrlink && oldProperties.abbrlink != properties.abbrlink) {
-        // update the abbrlink for the page
-        const abbrlink = oldProperties.abbrlink;
-        const text = {
-          type: 'text',
-          plain_text: abbrlink,
-          text: { content: abbrlink }
-        }
-        if (page.properties.abbrlink.rich_text.length == 0) {
-          page.properties.abbrlink.rich_text.push(text);
-        } else {
-          page.properties.abbrlink.rich_text[0] = text;
-        }
-        console.log(`Page abbrlink updated: ${abbrlink}`);
-        pageNeedUpdate = true;
-      }
-    } else {
-      console.log(`File not exists: ${filePath}, it's a new page.`);
-      mkdirSync(output_dir, { recursive: true });
-    }
-    // get the properties of the page
-    properties = getPropertiesDict(page);
-    console.log(`Finnal properties for markdown file:`, properties);
-    // tranform the page of nation to markdown
-    await page2Markdown(page, filePath, properties);
-    if (config.migrate_image) await migrateImages(filePath);
-    // update the page status to published
-    if (pageNeedUpdate) await updatePageProperties(page);
-    console.log(`Page deployed: ${page.id}, ${page.title}`);
+    // if the page is exists, update the abbrlink of the page if it is empty and the local file has the abbrlink
+    var notionProp = notionPagePropList.find((prop) => prop.id == page.id);
+    if (localProp.abbrlink && notionProp.abbrlink != undefined && !notionProp.abbrlink) {
+      console.log(`Update the abbrlink of the page: ${notionProp.id}, ${notionProp.title}`);
+      const abbrlink = localProp.abbrlink;
+      const text = {
+        "type": "text",
+        "text": {
+          "content": abbrlink,
+          "link": null
+        },
+        "plain_text": abbrlink,
+        "href": null
+      };
+      page.properties.abbrlink.rich_text.push(text);
+    };
   }
-  if (pages.length == 0)
-    console.log(`no pages ${config.status.name}: ${config.status.unpublish}`);
+  /**
+   * 更新未发布的文章
+   */
+  // deal with notionPagePropList
+  if (notionPagePropList.length == 0) {
+    console.log("No page to deal with.");
+    return;
+  }
+  notionPagePropList.forEach(async (prop) => {
+    let page = pages.find((page) => page.id == prop.id);
+    console.log(`Handle page: ${prop.id}, ${prop.title}`);
+    /**
+     * 只处理未发布的文章
+     */
+    // skip the page if it is not exists or published
+    if (!page || prop[config.status.name] == config.status.published) {
+      console.log(`Page is not exists or published, skip: ${prop.id}, ${prop.title}`);
+      return;
+    }
+    /**
+     * 对于已发布的文章，如果本地文件存在，且存在abbrlink，则更新notion中的abbrlink
+     */
+    // check if the local file exists
+    if (!existsSync(prop.filePath)) {
+      // the local file is not exists
+      console.log(`File ${prop.filePath} is not exists, it's a new page.`);
+    }
+    // check the output directory, if the file is not exists, create it
+    if (!existsSync(prop.output_dir)) {
+      mkdirSync(prop.output_dir, { recursive: true });
+    }
+    // update the page status to published
+    if (prop[config.status.name] == config.status.unpublish) {
+      page.properties[config.status.name].select = { name: config.status.published };
+    }
+    // get the latest properties of the page
+    const newPageProp = await getPropertiesDict(page);
+    await page2Markdown(page, prop.filePath, newPageProp);
+    if (config.migrate_image) await migrateImages(prop.filePath);
+    // update the page status to published
+    await updatePageProperties(page);
+    console.log(`Page conversion successfully: ${prop.id}, ${prop.title}`);
+  });
+  console.log("All pages are handled, ${notionPagePropList.length} pages are handled.");
 }
 
 /**
@@ -176,7 +207,7 @@ async function page2Markdown(page, filePath, properties) {
  * @param {*} file 
  */
 async function migrateImages(file) {
-  console.log(`handling file: ${file}`)
+  console.log(`[Image migrate]Handling file: ${file}`)
   let res = await Migrater(picgo, [file]);
   if (res.success != res.total)
     throw new Error(
@@ -219,7 +250,7 @@ async function getPages(database_id, types = ["unpublish", "published"]) {
     }
   }
   // print the filter
-  console.log('Page filter:', filter);
+  // console.log('Page filter:', filter);
   let resp = await notion.databases.query({
     database_id: database_id,
     filter: filter,
@@ -233,7 +264,7 @@ async function getPages(database_id, types = ["unpublish", "published"]) {
  */
 async function updatePageProperties(page) {
   // only update the status property
-  console.log('Page full properties updated:', page.properties);
+  // console.log('Page full properties updated:', page.properties);
   let props_updated = {};
   // update status and abbrlink if exists
   [config.status.name, 'abbrlink'].forEach(key => {
@@ -254,7 +285,7 @@ async function updatePageProperties(page) {
  * @returns 
  */
 
-async function loadPropertiesFromMarkdownFile(filepath) {
+function loadPropertiesAndContentFromMarkdownFile(filepath) {
   // load properties from the markdown file
   // check if the file already exists
   if (!existsSync(filepath)) {
@@ -266,9 +297,13 @@ async function loadPropertiesFromMarkdownFile(filepath) {
   const fm = content.match(/---\n([\s\S]*?)\n---/);
   // parse the front matter
   if (!fm) return null;
-  const properties = YAML.parse(fm[1]);
-  // console.log('File properties:', properties);
-  return properties;
+  try {
+    const properties = YAML.parse(fm[1]);
+    return properties;
+  } catch (e) {
+    console.log('Parse yaml error:', e);
+    return null;
+  }
 }
 
 /**
@@ -276,10 +311,12 @@ async function loadPropertiesFromMarkdownFile(filepath) {
  * @param {*} page
  * @returns {Object}
  */
-function getPropertiesDict(page) {
+async function getPropertiesDict(page) {
   let data = {};
   for (const key in page.properties) {
-    data[key] = getPropVal(page.properties[key]);
+    const value = getPropVal(page.properties[key]);
+    if (value == undefined || value == "") continue;
+    data[key] = value;
   }
   // cover image
   if (page.cover) {
@@ -289,7 +326,8 @@ function getPropertiesDict(page) {
       data['cover'] = page.cover.file.url;
     }
   }
-  // created, updated time
+  // id, created, updated time
+  data['id'] = page.id;
   data['created'] = page.created_time;
   data['updated'] = page.last_edited_time;
   return data;
@@ -339,7 +377,7 @@ function icon2md(icon) {
 
 function getPropVal(data) {
   let val = data[data.type];
-  if (!val) return '';
+  if (!val) return undefined;
   switch (data.type) {
     case "multi_select":
       return val.map((a) => a.name);
