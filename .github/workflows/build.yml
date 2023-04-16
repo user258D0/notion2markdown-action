@@ -25,7 +25,6 @@ jobs:
           node-version: ${{ matrix.node_version }}
       - name: Build dist
         run: |
-          git pull
           npm install
           npm i -g @vercel/ncc
           npm run build
