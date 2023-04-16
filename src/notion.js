@@ -63,16 +63,20 @@ async function sync() {
     return properties;
   });
   // query the filename list from the output directory
-  readdirSync(config.output_dir.post).forEach((file) => {
-    if (file.endsWith(".md")) {
-      // check if the file exists in the pages
-      if (!notion_page_prop_list.some((page) => page.filename == file)) {
-        // remove the file
-        fs.unlinkSync(join(config.output, file));
-        console.log(`File ${file} removed.`);
+  if (!existsSync(config.output_dir.post)) {
+    mkdirSync(config.output_dir.post);
+  } else {
+    readdirSync(config.output_dir.post).forEach((file) => {
+      if (file.endsWith(".md")) {
+        // check if the file exists in the pages
+        if (!notion_page_prop_list.some((page) => page.filename == file)) {
+          // remove the file
+          fs.unlinkSync(join(config.output, file));
+          console.log(`File ${file} removed.`);
+        }
       }
-    }
-  });
+    });
+  }
   for (let i = 0; i < pages.length; i++) {
     const page = pages[i];
     console.log(`Handling page: ${page.id} [${i + 1}/${pages.length}]`);
