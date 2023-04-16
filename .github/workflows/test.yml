@@ -1,0 +1,24 @@
+name: Test the code
+on:
+  workflow_dispatch:
+  workflow_call:
+
+jobs:
+  build:
+    name: Ubuntu and node ${{ matrix.node_version }} and ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node_version: [16.x]
+    steps:
+      - name: test the notion2markdown-action
+        uses: Doradx/notion2markdown-action@latest
+        with:
+          notion_secret: ${{ secrets.NOTION_TOKEN }}
+          database_id: ${{ secrets.NOTION_DATABASE_ID }}
+          migrate_image: true
+          picBedConfig: ${{ secrets.PICBED_CONFIG}}
+          page_output_dir: 'md/page'
+          post_output_dir: 'md/_posts'
+
