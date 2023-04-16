@@ -32,4 +32,4 @@ jobs:
   test:
     name: Test the action
     needs: build
-    uses: Doradx/notion2markdown-action/.github/workflows/test.yml@master
+    uses: Doradx/notion2markdown-action/.github/workflows/test.yml@main
