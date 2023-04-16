@@ -67,7 +67,9 @@ inputs:
   post_output_dir:
     description: post类型页面的输出文件夹
     default: "source/_posts/notion"
-
+  clean_unpublished_post:
+    description: 是否清除未发表的post
+    default: "false"
 runs:
   using: 'node16'
   main: 'dist/index.js'

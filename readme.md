@@ -90,6 +90,9 @@ inputs:
   post_output_dir:
     description: post类型页面的输出文件夹
     default: "source/_posts/notion"
+  clean_unpublished_post:
+    description: 是否清除未发表的post
+    default: "false"
 
 ```
 
@@ -117,6 +120,7 @@ jobs:
         picBedConfig: ${{ secrets.PICBED_CONFIG}}
         page_output_dir: 'md/page'
         post_output_dir: 'md/_posts'
+        clean_unpublished_post: true
 
     - name: update blog
       run: |
