@@ -10,7 +10,7 @@
 
 ### Notion
 
-- 使用 [database 模板](https://mohuishou.notion.site/3999b0ae72364a4b99a87f7d9d0a52be?v=1df90fd8110541679dc48866b80031ee) 创建一个数据库
+- 使用 [database 模板](https://doradx.notion.site/397943b2d0384e15ba69448900823984?v=3cea1a4916ac48efba8b83113518c1ac) 创建一个数据库
   ![](docs/database_tpl.jpg)
 - 参考 [Notion 官方教程](https://developers.notion.com/docs/getting-started#step-1-create-an-integration) 创建一个应用，并获取到 token
   ![](./docs/app-sec.jpg)
