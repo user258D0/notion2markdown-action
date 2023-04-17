@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-12 18:38:51 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-17 15:16:27 +02:00
+ * @LastEditTime: 2023-04-17 15:57:59 +02:00
  * @FilePath: \src\notion.js
  * @Description: 
  * 
@@ -399,7 +399,9 @@ function getPropVal(data) {
     case "select":
       return val.name;
     case "date":
-      return moment(val.start).tz(config.timezone).format();
+      var mt = moment(val.start);
+      if (!mt.isValid()) return val.start;
+      return mt.tz(config.timezone).format('YYYY-MM-DD HH:mm:ss');
     case "rich_text":
     case "title":
       return val.map((a) => a.plain_text).join("");
@@ -410,7 +412,9 @@ function getPropVal(data) {
       return val[0][val[0].type].url;
     case "created_time":
     case "last_edited_time":
-      return moment(val).tz(config.timezone).format();
+      var mt = moment(val);
+      if (!mt.isValid()) return val;
+      return mt.tz(config.timezone).format('YYYY-MM-DD HH:mm:ss');
     default:
       return "";
   }
