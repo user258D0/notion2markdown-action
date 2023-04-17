@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-12 18:38:51 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-17 14:51:13 +02:00
+ * @LastEditTime: 2023-04-17 15:16:27 +02:00
  * @FilePath: \src\notion.js
  * @Description: 
  * 
@@ -19,7 +19,7 @@ const crypto = require("crypto");
 const { extname, join } = require("path");
 const Migrater = require("./migrate");
 const { format } = require("prettier");
-const moment = require("moment");
+const moment = require('moment-timezone');
 
 let config = {
   notion_secret: "",
@@ -36,6 +36,7 @@ let config = {
     post: "",
     clean_unpublished_post: true,
   },
+  timezone: "Asia/Shanghai",
 };
 
 let notion = new Client({ auth: config.notion_secret });
@@ -398,7 +399,7 @@ function getPropVal(data) {
     case "select":
       return val.name;
     case "date":
-      return val.start;
+      return moment(val.start).tz(config.timezone).format();
     case "rich_text":
     case "title":
       return val.map((a) => a.plain_text).join("");
@@ -409,7 +410,7 @@ function getPropVal(data) {
       return val[0][val[0].type].url;
     case "created_time":
     case "last_edited_time":
-      return moment(val).format();
+      return moment(val).tz(config.timezone).format();
     default:
       return "";
   }

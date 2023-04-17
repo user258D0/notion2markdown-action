@@ -70,6 +70,10 @@ inputs:
   clean_unpublished_post:
     description: 是否清除未发表的post
     default: "false"
+  timezone: 
+    description: 设置的时区
+    default: "Asia/Shanghai"
+
 runs:
   using: 'node16'
   main: 'dist/index.js'
