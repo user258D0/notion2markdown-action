@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-12 18:38:51 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-17 02:31:16 +02:00
+ * @LastEditTime: 2023-04-17 13:57:38 +02:00
  * @FilePath: \src\notion.js
  * @Description: 
  * 
@@ -407,9 +407,8 @@ function getPropVal(data) {
       if (val.length < 1) return "";
       return val[0][val[0].type].url;
     case "created_time":
-      return created_time;
     case "last_edited_time":
-      return last_edited_time
+      return val;
     default:
       return "";
   }
