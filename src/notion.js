@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-12 18:38:51 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-16 19:55:16 +02:00
+ * @LastEditTime: 2023-04-17 02:31:16 +02:00
  * @FilePath: \src\notion.js
  * @Description: 
  * 
@@ -179,7 +179,13 @@ async function sync() {
     // get the latest properties of the page
     const newPageProp = await getPropertiesDict(page);
     await page2Markdown(page, prop.filePath, newPageProp);
-    if (config.migrate_image) await migrateImages(prop.filePath);
+    if (config.migrate_image) {
+      const res = await migrateImages(prop.filePath);
+      if (!res) {
+        console.warn(`Migrate images failed: ${prop.id}, ${prop.title}`);
+        return false;
+      }
+    }
     // update the page status to published
     await updatePageProperties(page);
     console.log(`Page conversion successfully: ${prop.id}, ${prop.title}`);
@@ -211,10 +217,15 @@ async function page2Markdown(page, filePath, properties) {
 async function migrateImages(file) {
   console.log(`[Image migrate]Handling file: ${file}`)
   let res = await Migrater(picgo, [file]);
-  if (res.success != res.total)
-    throw new Error(
-      `file migrate img fail, total: ${res.total}, success: ${res.success}`
-    );
+  if (!res) {
+    console.error(`[Image migrate]File migrate img fail: ${file}`)
+    return false;
+  };
+  if (res.success != res.total) {
+    console.error(`file migrate img fail, total: ${res.total}, success: ${res.success}`)
+    return false;
+  }
+  return true;
 }
 
 /**
