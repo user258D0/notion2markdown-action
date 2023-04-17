@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-12 18:38:51 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-17 15:57:59 +02:00
+ * @LastEditTime: 2023-04-17 19:19:34 +02:00
  * @FilePath: \src\notion.js
  * @Description: 
  * 
@@ -37,6 +37,7 @@ let config = {
     clean_unpublished_post: true,
   },
   timezone: "Asia/Shanghai",
+  pic_base_url: "",
 };
 
 let notion = new Client({ auth: config.notion_secret });
@@ -48,16 +49,11 @@ function init(conf) {
   notion = new Client({ auth: config.notion_secret });
 
   picgo.setConfig({
-    picBed: config.picBed,
-  });
-
-  // 文件重命名为 md5
-  picgo.on("beforeUpload", (ctx) => {
-    ctx.output.forEach((item) => {
-      let ext = extname(item.fileName);
-      item.fileName =
-        crypto.createHash("md5").update(item.buffer).digest("hex") + ext;
-    });
+    "picBed": config.picBed,
+    "picgo-plugin-pic-migrater": {
+      exclude: config.pic_base_url ? [config.pic_base_url] : null,
+    },
+    "pic-base-url": config.pic_base_url || null
   });
 
   // passing notion client to the option

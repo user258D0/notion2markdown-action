@@ -84,6 +84,10 @@ inputs:
       ```
       详见: https://picgo.github.io/PicGo-Core-Doc/zh/guide/config.html#%E6%89%8B%E5%8A%A8%E7%94%9F%E6%88%90
     default: "{}"
+  pic_base_url:
+    description: |
+      图床的基础链接, 例如: https://i.blog.com/image/，如填写此链接，在图片上传图床前，会检查该图片是否已经上传过，如已上传则跳过，提升效率。
+    default: ""
   page_output_dir:
     description: page类型页面的输出文件夹
     default: "source/"
@@ -93,6 +97,9 @@ inputs:
   clean_unpublished_post:
     description: 是否清除未发表的post
     default: "false"
+  timezone: 
+    description: 设置的时区
+    default: "Asia/Shanghai"
 
 ```
 

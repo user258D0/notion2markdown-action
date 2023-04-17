@@ -2,7 +2,6 @@ const notion = require("./notion");
 const core = require("@actions/core");
 
 
-
 function isJson(str) {
   try {
     const obj = JSON.parse(str);
@@ -12,34 +11,37 @@ function isJson(str) {
   return false;
 }
 
-var picBedConfig = {};
-var migrate_image = core.getInput("migrate_image") === "true";
+var migrate_image = core.getInput("migrate_image") === "true" || false;
+const picBedConfigStr = core.getInput("picBedConfig") || "{}";
 
 // test the picBed config
-if (!isJson(core.getInput("picBedConfig"))) {
+if (!isJson(picBedConfigStr)) {
   core.warning("picBedConfig is not a valid json string, use default config: {}, and set migrate_image to false.");
   migrate_image = false;
 }
 
+var picBedConfig = {};
+
 if (migrate_image) {
   core.info("migrate_image is true, use picBedConfig to upload images.");
-  picBedConfig = JSON.parse(core.getInput("picBedConfig"));
+  picBedConfig = JSON.parse(picBedConfigStr);
 }
 
 let config = {
   notion_secret: core.getInput("notion_secret"),
   database_id: core.getInput("database_id"),
-  migrate_image: migrate_image,
-  picBed: picBedConfig,
+  migrate_image: migrate_image || false,
+  picBed: picBedConfig || {},
+  pic_base_url: core.getInput("pic_base_url") || null,
   status: {
-    name: core.getInput("status_name"),
-    unpublish: core.getInput("status_unpublish"),
-    published: core.getInput("status_published"),
+    name: core.getInput("status_name") || "status",
+    unpublish: core.getInput("status_unpublish") || "未发布",
+    published: core.getInput("status_published") || "已发布",
   },
   output_dir: {
-    page: core.getInput("page_output_dir"),
-    post: core.getInput("post_output_dir"),
-    clean_unpublished_post: core.getInput("clean_unpublished_post") === "true",
+    page: core.getInput("page_output_dir") || "source/",
+    post: core.getInput("post_output_dir") || "source/_posts/notion/",
+    clean_unpublished_post: core.getInput("clean_unpublished_post") === "true" || false,
   },
   timezone: core.getInput("timezone") || "Asia/Shanghai",
 };
