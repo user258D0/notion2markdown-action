@@ -463,7 +463,6 @@ inputs:
 >  event can be delayed during periods of high loads of GitHub Actions workflow runs. High load times include the start of every hour. If the load is sufficiently high enough, some queued jobs may be dropped. To decrease the chance of delay, schedule your workflow to run at a different time of the hour.
 
 - 后期可考虑换为`Webhook`(更及时、节省资源)
-- ~~已发布的稿件，如何撤销？只能上~~~~`GitHub`~~~~或者~~~~`VS CODE`~~ ~~（已支持）~~
 
 # 主要参考
 
