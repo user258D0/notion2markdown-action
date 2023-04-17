@@ -407,9 +407,9 @@ function getPropVal(data) {
       if (val.length < 1) return "";
       return val[0][val[0].type].url;
     case "created_time":
-      return val.created_time;
+      return created_time;
     case "last_edited_time":
-      return val.last_edited_time
+      return last_edited_time
     default:
       return "";
   }
