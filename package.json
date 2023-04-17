@@ -1,6 +1,6 @@
 {
   "name": "notion2markdown-action",
-  "version": "0.4.4",
+  "version": "0.4.5",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -16,7 +16,8 @@
     "@notionhq/client": "^0.4.9",
     "adm-zip": "^0.5.9",
     "axios": "^0.24.0",
-    "md5-file": "^5.0.0"
+    "md5-file": "^5.0.0",
+    "moment": "^2.29.4"
   },
   "devDependencies": {
     "@types/node": "^16.11.12",

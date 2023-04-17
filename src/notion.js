@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-12 18:38:51 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-17 13:57:38 +02:00
+ * @LastEditTime: 2023-04-17 14:51:13 +02:00
  * @FilePath: \src\notion.js
  * @Description: 
  * 
@@ -19,6 +19,7 @@ const crypto = require("crypto");
 const { extname, join } = require("path");
 const Migrater = require("./migrate");
 const { format } = require("prettier");
+const moment = require("moment");
 
 let config = {
   notion_secret: "",
@@ -341,8 +342,8 @@ async function getPropertiesDict(page) {
   }
   // id, created, updated time
   data['id'] = page.id;
-  data['created'] = page.created_time;
-  data['updated'] = page.last_edited_time;
+  // data['created'] = page.created_time;
+  // data['updated'] = page.last_edited_time;
   return data;
 }
 
@@ -408,7 +409,7 @@ function getPropVal(data) {
       return val[0][val[0].type].url;
     case "created_time":
     case "last_edited_time":
-      return val;
+      return moment(val).format();
     default:
       return "";
   }
