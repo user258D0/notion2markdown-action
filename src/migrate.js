@@ -51,6 +51,7 @@ class NotionMigrater extends Migrater.default {
     if (!this.urlArray || this.urlArray.length === 0) {
       return result;
     }
+    // filter the url using include and exclude
     const toUploadURLs = this.urlArray.filter(url => ((!include || includesReg.test(url)) && (!exclude || !excludesReg.test(url)))).map(async (url) => {
       return await new Promise(async (resolve, reject) => {
         result.total += 1;
