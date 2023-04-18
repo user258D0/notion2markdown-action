@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-12 18:38:51 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-18 13:39:15 +02:00
+ * @LastEditTime: 2023-04-18 16:42:35 +02:00
  * @FilePath: \src\notion.js
  * @Description: 
  * 
@@ -20,6 +20,8 @@ const { extname, join } = require("path");
 const Migrater = require("./migrate");
 const { format } = require("prettier");
 const moment = require('moment-timezone');
+const axios = require('axios');
+const cheerio = require('cheerio');
 
 let config = {
   notion_secret: "",
@@ -59,7 +61,37 @@ function init(conf) {
   // passing notion client to the option
   n2m = new NotionToMarkdown({ notionClient: notion });
   n2m.setCustomTransformer("callout", callout(n2m));
-  n2m.setCustomTransformer("embed", embedHandler(n2m));
+  n2m.setCustomTransformer("bookmark", async (block) => {
+    const { bookmark, author } = block;
+    if (!bookmark?.url) return "";
+    return await axios.get(bookmark.url).then((res) => {
+      const $ = cheerio.load(res.data);
+      const title = $('meta[property="og:title"]').attr('content') || $('meta[name="twitter:title"]').attr('content') || $('title').text();
+      const description = $('meta[property="og:description"]').attr('content') || $('meta[name="twitter:description"]').attr('content') || $('meta[name="description"]').attr('content');
+      const cover = $('meta[property="og:image"]').attr('content') || $('meta[name="twitter:image"]').attr('content') || $('meta[name="image"]').attr('content') || "";
+      var favicon = $('link[rel="shortcut icon"]').attr('href') || $('link[rel="icon"]').attr('href') || "";
+      if (favicon.startsWith("//")) favicon = "https:" + favicon;
+      if (favicon.startsWith("/")) favicon = "https://" + new URL(bookmark.url).hostname + favicon;
+      return {
+        title: title,
+        description: description,
+        cover: cover,
+        favicon: favicon,
+        url: bookmark.url,
+      }
+    }).then((p) => {
+      return `<div style="display: flex;"><a href="${p.url}"target="_blank"rel="noopener noreferrer" style="display: flex; color: inherit; text-decoration: none; user-select: none; transition: background 20ms ease-in 0s; cursor: pointer; flex-grow: 1; min-width: 0px; flex-wrap: wrap-reverse; align-items: stretch; text-align: left; overflow: hidden; border: 1px solid rgba(55, 53, 47, 0.16); border-radius: 3px; position: relative; fill: inherit;"><div style="flex: 4 1 180px; padding: 12px 14px 14px; overflow: hidden; text-align: left;"><div style="font-size: 14px; line-height: 20px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 24px; margin-bottom: 2px;">${p.title}</div><div style="font-size: 12px; line-height: 16px; color: rgba(55, 53, 47, 0.65); height: 32px; overflow: hidden;">${p.description}</div><div style="display: flex; margin-top: 6px;"><img src="${p.favicon}"style="width: 16px; height: 16px; min-width: 16px; margin-right: 6px;"><div style="font-size: 12px; line-height: 16px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.url}</div></div></div><div style="flex: 1 1 180px; display: block; position: relative;"><div style="position: absolute; inset: 0px;"><div style="width: 100%; height: 100%;"><img src="${p.cover}"referrerpolicy="same-origin"style="display: block; object-fit: cover; border-radius: 1px; width: 100%; height: 100%;"></div></div></div></a></div>`
+    })
+      .catch((err) => {
+        console.error('Bookmark preview fetch error: ', err);
+        return false
+      });
+  });
+  n2m.setCustomTransformer("video", async (block) => {
+    const { video } = block;
+    if (!video?.url) return false;
+    return false;
+  });
 }
 
 async function sync() {
@@ -414,12 +446,6 @@ function getPropVal(data) {
       return mt.tz(config.timezone).format('YYYY-MM-DD HH:mm:ss');
     default:
       return "";
-  }
-}
-
-function embedHandler(n2m) {
-  return async (block) => {
-    return block
   }
 }
 

@@ -27,12 +27,18 @@ if (migrate_image) {
   picBedConfig = JSON.parse(picBedConfigStr);
 }
 
+var pic_base_url = core.getInput("pic_base_url") || null;
+
+if (pic_base_url && !pic_base_url.endsWith("/")) {
+  pic_base_url = pic_base_url + "/";
+}
+
 let config = {
   notion_secret: core.getInput("notion_secret"),
   database_id: core.getInput("database_id"),
   migrate_image: migrate_image || false,
   picBed: picBedConfig || {},
-  pic_base_url: core.getInput("pic_base_url") || null,
+  pic_base_url: pic_base_url || null,
   status: {
     name: core.getInput("status_name") || "status",
     unpublish: core.getInput("status_unpublish") || "未发布",
