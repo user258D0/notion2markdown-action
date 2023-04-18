@@ -1,7 +1,6 @@
 const Migrater = require("picgo-plugin-pic-migrater/dist/lib/Migrater.js");
 const FileHandler = require("picgo-plugin-pic-migrater/dist/lib/FileHandler.js");
 const crypto = require("crypto");
-const { extname, join } = require("path");
 const axios = require("axios");
 
 class NotionMigrater extends Migrater.default {
@@ -77,9 +76,8 @@ class NotionMigrater extends Migrater.default {
 
     // 文件重命名为 md5 hash
     toUploadImgs.forEach((item) => {
-      let ext = extname(item.fileName);
       item.fileName =
-        crypto.createHash("md5").update(item.buffer).digest("hex") + ext;
+        crypto.createHash("md5").update(item.buffer).digest("hex") + item.extname;
     });
     /**
      * check the url if it is already uploaded, if base_url is set
@@ -98,7 +96,7 @@ class NotionMigrater extends Migrater.default {
             };
           }
         } catch (e) {
-          console.warn(`Some error happened when checking image ${url}`);
+          console.warn(`Some error happened when checking image ${url}, ${e}`);
         }
         console.log(`Image ${url} not exists`);
         return null;
