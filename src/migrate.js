@@ -97,8 +97,9 @@ class NotionMigrater extends Migrater.default {
             };
           }
         } catch (e) {
-          console.warn(e);
+          console.warn(`Some error happened when checking image ${url}`);
         }
+        console.log(`Image ${url} not exists`);
         return null;
       }));
       result.urls = result.urls.concat(existsImgs.filter(item => item !== null));
