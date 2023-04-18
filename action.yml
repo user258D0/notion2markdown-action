@@ -79,5 +79,5 @@ inputs:
     default: "Asia/Shanghai"
 
 runs:
-  using: 'node18'
+  using: 'node16'
   main: 'dist/index.js'
