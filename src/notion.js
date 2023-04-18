@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-12 18:38:51 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-17 19:19:34 +02:00
+ * @LastEditTime: 2023-04-18 13:39:15 +02:00
  * @FilePath: \src\notion.js
  * @Description: 
  * 
@@ -59,6 +59,7 @@ function init(conf) {
   // passing notion client to the option
   n2m = new NotionToMarkdown({ notionClient: notion });
   n2m.setCustomTransformer("callout", callout(n2m));
+  n2m.setCustomTransformer("embed", embedHandler(n2m));
 }
 
 async function sync() {
@@ -108,7 +109,7 @@ async function sync() {
   for (let i = 0; i < localPostFileList.length; i++) {
     const file = localPostFileList[i];
     if (!file.endsWith(".md")) {
-      return;
+      continue;
     }
     var localProp = loadPropertiesAndContentFromMarkdownFile(join(config.output_dir.post, file));
     if (!localProp) {
@@ -119,7 +120,7 @@ async function sync() {
     if (!page && config.output_dir.clean_unpublished_post) {
       console.log(`Page is not exists, delete the local file: ${file}`);
       unlinkSync(join(config.output_dir.post, file));
-      return;
+      continue;
     }
     // if the page is exists, update the abbrlink of the page if it is empty and the local file has the abbrlink
     var notionProp = notionPagePropList.find((prop) => prop.id == page.id);
@@ -413,6 +414,12 @@ function getPropVal(data) {
       return mt.tz(config.timezone).format('YYYY-MM-DD HH:mm:ss');
     default:
       return "";
+  }
+}
+
+function embedHandler(n2m) {
+  return async (block) => {
+    return block
   }
 }
 
