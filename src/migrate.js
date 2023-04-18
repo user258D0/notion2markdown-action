@@ -87,13 +87,17 @@ class NotionMigrater extends Migrater.default {
       // check if the file exists on the server
       const existsImgs = await Promise.all(toUploadImgs.map(async (item) => {
         const url = `${base_url}${item.fileName}`;
-        const res = await axios.head(url);
-        if (res && res.status === 200) {
-          console.log(`Image ${url} exists`);
-          return {
-            original: item.origin,
-            new: url
-          };
+        try {
+          const res = await axios.head(url);
+          if (res && res.status === 200) {
+            console.log(`Image ${url} exists`);
+            return {
+              original: item.origin,
+              new: url
+            };
+          }
+        } catch (e) {
+          console.warn(e);
         }
         return null;
       }));
