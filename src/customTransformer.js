@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-18 22:07:58 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-19 01:31:25 +02:00
+ * @LastEditTime: 2023-04-19 02:46:19 +02:00
  * @FilePath: \src\customTransformer.js
  * @Description: 
  * 
@@ -233,7 +233,10 @@ async function embed(block) {
     try {
         switch (new URL(url).hostname) {
             case "twitter.com":
-                iframe = `<blockquote class="twitter-tweet"><a href="${url}"></a></blockquote><script async src="https://platform.twitter.com/widgets.js" charset="utf-8"></script>`;
+                // get twitter username and status id from status url like: https://twitter.com/engineers_feed/status/1648224909628428288
+                // query twitter embed code from twitter
+                const data = await axios.get(`https://publish.twitter.com/oembed?url=${url}`).then((resp) => resp.data);
+                iframe = data.html;
                 break;
             case "www.google.com":
                 iframe = `<iframe id="gmap_canvas" src="${url}" frameborder="0" scrolling="no" style="width: 100%; margin:0; aspect-ratio: 16/9;"></iframe>`;
@@ -243,11 +246,11 @@ async function embed(block) {
                 return false;
         }
     } catch (err) {
-        console.error("Error parsing embed block: ", block);
+        console.error("Error parsing embed block: ", block, err);
         return false;
     }
     if (!iframe) {
-        console.error("Embed block without iframe: ", block);
+        console.error("Embed block without iframe: ", block, err);
         return false;
     }
     var caption_div = caption ? CAPTION_DIV_TEMPLATE.replace("{{caption}}", caption) : "";
