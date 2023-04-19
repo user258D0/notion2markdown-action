@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-18 22:07:58 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-19 16:10:00 +02:00
+ * @LastEditTime: 2023-04-19 18:59:22 +02:00
  * @FilePath: \src\customTransformer.js
  * @Description: 
  * 
@@ -279,10 +279,16 @@ async function embed(block) {
     try {
         switch (new URL(url).hostname) {
             case "twitter.com":
-                // get twitter username and status id from status url like: https://twitter.com/engineers_feed/status/1648224909628428288
-                // query twitter embed code from twitter
-                const data = await axios.get(`https://publish.twitter.com/oembed?url=${url}`).then((resp) => resp.data);
-                iframe = data.html;
+                try {
+                    // get twitter username and status id using regex from status url like: https://twitter.com/engineers_feed/status/1648224909628428288
+                    const { username, status_id } = url.match(/twitter\.com\/(?<username>\w+)\/status\/(?<status_id>\d+)/).groups;
+                    // query twitter embed code from twitter
+                    const data = await axios.get(`https://publish.twitter.com/oembed?url=https://twitter.com/${username}/status/${status_id}`).then((resp) => resp.data);
+                    iframe = data.html;
+                } catch (err) {
+                    console.error(`Error fetching twitter embed code: ${err}, url: ${url}`);
+                    return false;
+                }
                 break;
             case "www.google.com":
                 // check if the url is embed
@@ -293,7 +299,7 @@ async function embed(block) {
                 iframe = `<iframe src="${url}" style="width: 100%; margin:0; aspect-ratio: 16/9;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
                 break;
             default:
-                console.error("Embed block with unsupported domain: ", block);
+                console.warn("Embed block with unsupported domain: ", block);
                 iframe = `<iframe src="${url}" style="width: 100%; margin:0; aspect-ratio: 16/9;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`
         }
     } catch (err) {
