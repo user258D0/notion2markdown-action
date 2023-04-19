@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-18 22:07:58 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-19 02:46:19 +02:00
+ * @LastEditTime: 2023-04-19 04:04:34 +02:00
  * @FilePath: \src\customTransformer.js
  * @Description: 
  * 
@@ -11,6 +11,10 @@
 
 const axios = require('axios');
 const cheerio = require('cheerio');
+
+function capitalizeFirstLetter(str) {
+    return str.charAt(0).toUpperCase() + str.slice(1);
+}
 
 var CAPTION_DIV_TEMPLATE = `<div style="text-align: center; margin:0;"><p>{{caption}}</p></div>`;
 /**
@@ -85,7 +89,7 @@ async function link_preview_github(url) {
     } else if (path.length == 3) {
         // pulls/issues/actions, pull home page info and add "pulls" or "issues"
         const info = await axios.get(`https://api.github.com/repos/${path[0]}/${path[1]}`).then((res) => res.data);
-        data.title = info.full_name + "——" + path[2].toUpperCase();
+        data.title = info.full_name + "  " + capitalizeFirstLetter(path[2]);
         data.avatar = info.owner.avatar_url;
         data.owner = info.owner.login;
         data.remark = "Created At: " + info.created_at;
@@ -102,7 +106,7 @@ async function link_preview_github(url) {
         }
         if (!req_url) return false;
         const info = await axios.get(req_url).then((res) => res.data);
-        data.title = info.title + "——" + info.state.toUpperCase();
+        data.title = info.title + "  " + capitalizeFirstLetter(info.state);
         data.avatar = info.user.avatar_url;
         data.owner = info.user.login;
         data.remark = "Created At: " + info.created_at;
@@ -150,10 +154,21 @@ async function bookmark(block) {
     if (!bookmark?.url) return "";
     const caption = bookmark.caption && bookmark.caption.length ? bookmark.caption[0].plain_text : "";
     return await axios.get(bookmark.url).then((res) => {
-        const $ = cheerio.load(res.data);
-        const title = $('meta[property="og:title"]').attr('content') || $('meta[name="twitter:title"]').attr('content') || $('title').text();
-        const description = $('meta[property="og:description"]').attr('content') || $('meta[name="twitter:description"]').attr('content') || $('meta[name="description"]').attr('content');
-        const cover = $('meta[property="og:image"]').attr('content') || $('meta[name="twitter:image"]').attr('content') || $('meta[name="image"]').attr('content') || "";
+        const $ = cheerio.load(res.data, {
+            ignoreWhitespace: true,
+            lowerCaseAttributeNames: true,
+            lowerCaseTags: true,
+        });
+        // get title, description, cover, favicon from meta tags, key case is not considered
+        const metaTags = $('head').find('meta');
+        var metas = {};
+        metaTags.each((i, e) => {
+            var name = $(e).attr('name') || $(e).attr('property');
+            if (name) metas[name.toLowerCase()] = $(e).attr('content');
+        });
+        const title = metas['og:title'] || metas['twitter:title'] || $('title').text();
+        const description = metas['og:description'] || metas['twitter:description'] || metas['description'] || "";
+        const cover = metas['og:image'] || metas['twitter:image'] || metas['image'] || "";
         var favicon = $('link[rel="shortcut icon"]').attr('href') || $('link[rel="icon"]').attr('href') || "";
         if (favicon.startsWith("//")) favicon = "https:" + favicon;
         if (favicon.startsWith("/")) favicon = "https://" + new URL(bookmark.url).hostname + favicon;
@@ -165,7 +180,8 @@ async function bookmark(block) {
             url: bookmark.url,
         }
     }).then((p) => {
-        var body_div = `<div style="display: flex; background:white;border-radius:5px"><a href="${p.url}"target="_blank"rel="noopener noreferrer" style="display: flex; color: inherit; text-decoration: none; user-select: none; transition: background 20ms ease-in 0s; cursor: pointer; flex-grow: 1; min-width: 0px; flex-wrap: wrap-reverse; align-items: stretch; text-align: left; overflow: hidden; border: 1px solid rgba(55, 53, 47, 0.16); border-radius: 5px; position: relative; fill: inherit;"><div style="flex: 4 1 180px; padding: 12px 14px 14px; overflow: hidden; text-align: left;"><div style="font-size: 14px; line-height: 20px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 24px; margin-bottom: 2px;">${p.title}</div><div style="font-size: 12px; line-height: 16px; color: rgba(55, 53, 47, 0.65); height: 32px; overflow: hidden;">${p.description}</div><div style="display: flex; margin-top: 6px;"><img src="${p.favicon}"style="width: 16px; height: 16px; min-width: 16px; margin-right: 6px;"><div style="font-size: 12px; line-height: 16px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.url}</div></div></div><div style="flex: 1 1 180px; display: block; position: relative;"><div style="position: absolute; inset: 0px;"><div style="width: 100%; height: 100%;"><img src="${p.cover}"referrerpolicy="same-origin"style="display: block; object-fit: cover; border-radius: 3px; width: 100%; height: 100%;"></div></div></div></a></div>`
+        var cover_div = p.cover ? `<div style="flex: 1 1 180px; display: block; position: relative;"><div style="position: absolute; inset: 0px;"><div style="width: 100%; height: 100%;"><img src="${p.cover}"referrerpolicy="same-origin"style="display: block; object-fit: cover; border-radius: 3px; width: 100%; height: 100%;"></div></div></div>` : "";
+        var body_div = `<div style="display: flex; background:white;border-radius:5px"><a href="${p.url}"target="_blank"rel="noopener noreferrer"style="display: flex; color: inherit; text-decoration: none; user-select: none; transition: background 20ms ease-in 0s; cursor: pointer; flex-grow: 1; min-width: 0px; flex-wrap: wrap-reverse; align-items: stretch; text-align: left; overflow: hidden; border: 1px solid rgba(55, 53, 47, 0.16); border-radius: 5px; position: relative; fill: inherit;"><div style="flex: 4 1 180px; padding: 12px 14px 14px; overflow: hidden; text-align: left;"><div style="font-size: 14px; line-height: 20px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 24px; margin-bottom: 2px;">${p.title}</div><div style="font-size: 12px; line-height: 16px; color: rgba(55, 53, 47, 0.65); height: 32px; overflow: hidden;">${p.description}</div><div style="display: flex; margin-top: 6px;"><img src="${p.favicon}"style="width: 16px; height: 16px; min-width: 16px; margin-right: 6px;"><div style="font-size: 12px; line-height: 16px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.url}</div></div></div>${cover_div}</a></div>`
         var caption_div = caption ? CAPTION_DIV_TEMPLATE.replace("{{caption}}", caption) : "";
         return `<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;">${body_div}${caption_div}</div>`;
     })
@@ -239,11 +255,16 @@ async function embed(block) {
                 iframe = data.html;
                 break;
             case "www.google.com":
-                iframe = `<iframe id="gmap_canvas" src="${url}" frameborder="0" scrolling="no" style="width: 100%; margin:0; aspect-ratio: 16/9;"></iframe>`;
+                // check if the url is embed
+                if (!url.includes("embed")) {
+                    console.error("Embed block with unsupported google url: ", url);
+                    return false;
+                }
+                iframe = `<iframe src="${url}" style="width: 100%; margin:0; aspect-ratio: 16/9;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
                 break;
             default:
                 console.error("Embed block with unsupported domain: ", block);
-                return false;
+                iframe = `<iframe src="${url}" style="width: 100%; margin:0; aspect-ratio: 16/9;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`
         }
     } catch (err) {
         console.error("Error parsing embed block: ", block, err);
