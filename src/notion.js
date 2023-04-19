@@ -130,7 +130,7 @@ async function sync() {
     }
     // if the page is exists, update the abbrlink of the page if it is empty and the local file has the abbrlink
     var notionProp = notionPagePropList.find((prop) => prop.id == page.id);
-    if (localProp.abbrlink && notionProp.abbrlink != undefined && !notionProp.abbrlink) {
+    if (localProp.abbrlink && page.properties.hasOwnProperty('abbrlink') && !notionProp.abbrlink) {
       console.log(`Update the abbrlink of the page: ${notionProp.id}, ${notionProp.title}`);
       const abbrlink = localProp.abbrlink;
       const text = {
