@@ -3,6 +3,14 @@ const FileHandler = require("picgo-plugin-pic-migrater/dist/lib/FileHandler.js")
 const crypto = require("crypto");
 const axios = require("axios");
 
+const imagemin = require("imagemin");
+const imageSize = require("image-size");
+const imageminPngquant = require("imagemin-pngquant");
+const imageminMozjpeg = require("imagemin-mozjpeg");
+const imageminGifsicle = require("imagemin-gifsicle");
+const imageminSvgo = require("imagemin-svgo");
+
+
 class NotionMigrater extends Migrater.default {
   async getPicFromURL(url) {
     return this.ctx.request({
@@ -31,7 +39,7 @@ class NotionMigrater extends Migrater.default {
   }
 
   async migrate() {
-    const originTransformer = this.ctx.getConfig('picBed.transformer');
+    const originTransformer = this.ctx.getConfig('picBed.transformer') || null;
     this.ctx.setConfig({
       'picBed.transformer': 'base64'
     });
@@ -73,7 +81,28 @@ class NotionMigrater extends Migrater.default {
       });
     });
     var toUploadImgs = await Promise.all(toUploadURLs).then(imgs => imgs.filter(img => img !== undefined));
-
+    // compress the image if the config is set
+    if (this.ctx.getConfig('compress')) {
+      toUploadImgs = await Promise.all(toUploadImgs.map(async (item) => {
+        return await imagemin.buffer(item.buffer, {
+          plugins: [
+            imageminPngquant(),
+            imageminMozjpeg(),
+            imageminGifsicle(),
+            imageminSvgo()
+          ],
+        }).then((buffer) => {
+          item.buffer = buffer;
+          // update image width and height based on the new buffer
+          const { width, height } = imageSize(buffer);
+          item.width = width;
+          item.height = height;
+          item.fileName = `${crypto.createHash("md5").update(buffer).digest("hex")}${item.extname}`;
+          // update the buffer
+          return item;
+        });
+      }));
+    }
     // 文件重命名为 md5 hash
     toUploadImgs.forEach((item) => {
       item.fileName =
@@ -96,6 +125,10 @@ class NotionMigrater extends Migrater.default {
             };
           }
         } catch (e) {
+          if (axios.isAxiosError(e) && e.response && e.response.status === 404) {
+            console.log(`Image ${url} not exists on pic bed.`);
+            return null;
+          }
           console.warn(`Some error happened when checking image ${url}, ${e}`);
         }
         console.log(`Image ${url} not exists`);

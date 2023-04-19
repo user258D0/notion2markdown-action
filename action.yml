@@ -65,6 +65,10 @@ inputs:
     description: |
       图床的基础链接, 例如: https://i.blog.com/image/，如填写此链接，在图片上传图床前，会检查该图片是否已经上传过，如已上传则跳过，提升效率。
     default: ""
+  pic_compress:
+    description: |
+      是否开启图片压缩？true为开启，默认不开启
+    default: ""
   page_output_dir:
     description: page类型页面的输出文件夹
     default: "source/"

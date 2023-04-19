@@ -39,6 +39,7 @@ let config = {
   migrate_image: migrate_image || false,
   picBed: picBedConfig || {},
   pic_base_url: pic_base_url || null,
+  pic_compress: core.getInput("pic_compress") === "true" || false,
   status: {
     name: core.getInput("status_name") || "status",
     unpublish: core.getInput("status_unpublish") || "未发布",

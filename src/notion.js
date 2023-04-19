@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-12 18:38:51 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-18 22:18:18 +02:00
+ * @LastEditTime: 2023-04-19 18:48:19 +02:00
  * @FilePath: \src\notion.js
  * @Description: 
  * 
@@ -38,6 +38,7 @@ let config = {
   },
   timezone: "Asia/Shanghai",
   pic_base_url: "",
+  pic_compress: false,
 };
 
 let notion = new Client({ auth: config.notion_secret });
@@ -50,13 +51,17 @@ function init(conf) {
 
   const domain = new URL(config.pic_base_url).hostname;
 
-  picgo.setConfig({
+  let picgo_config = {
     "picBed": config.picBed,
     "picgo-plugin-pic-migrater": {
       exclude: `^(?=.*${domain.replace('.', '\.')}).*|.*\.ico$`, // exclude the domain and icon
     },
     "pic-base-url": config.pic_base_url || null
-  });
+  }
+
+  picgo_config["compress"] = config.pic_compress ? true : false;
+
+  picgo.setConfig(picgo_config);
 
   // passing notion client to the option
   n2m = new NotionToMarkdown({ notionClient: notion });

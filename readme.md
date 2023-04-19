@@ -8,10 +8,6 @@
 
 > 本项目受[`notion-blog-action`](https://github.com/mohuishou/notion-blog-actions)项目启发，fork 后深度修改而得，在此感谢[Mo Huishou](https://github.com/mohuishou)。
 
-# [Updates]
-
-- 2023.04.17：添加`pic_base_url`可选配置项，可配置为自己图床的基础链接。图床上传过程中，如检测到此链接，将会自动查询要上传的图片是否已在图床（上传的文件名为 md5，据此检测）。此项可极大提高文章更新效率，节省宝贵的`GitHub Action`运行时间和`CDN`流量。
-
 # 概览
 
 方案主要分为三部分：
@@ -28,358 +24,58 @@
 
 # 食用方法
 
-## Notion 配置
+## [最新教程见博客](https://blog.cuger.cn/p/634642fd/)
 
-1. 从[Blog - Template](https://www.notion.so/397943b2d0384e15ba69448900823984) 复制`Dataset`模板
-2. 参考`Notion`官方教程[Create an integration (notion.com)](https://developers.notion.com/docs/create-a-notion-integration)，创建**Notion integration**
-   应用，并获取**`Secrets`**，直达链接：[My integrations | Notion Developers](https://www.notion.so/my-integrations)
-3. 将创建的`Dataset`数据库授权给刚创建的`Integration`应用，如下图：
 
-![](https://i.cuger.cn/b/6f6266d6d365ad8a49a8293e8518f9b8.png)
+# 渲染效果
 
-## GitHub 配置
+## bookmark
 
-### workflows 配置
+<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;"><div style="display: flex; background:white;border-radius:5px"><a href="https://blog.cuger.cn/p/634642fd/"target="_blank"rel="noopener noreferrer"style="display: flex; color: inherit; text-decoration: none; user-select: none; transition: background 20ms ease-in 0s; cursor: pointer; flex-grow: 1; min-width: 0px; flex-wrap: wrap-reverse; align-items: stretch; text-align: left; overflow: hidden; border: 1px solid rgba(55, 53, 47, 0.16); border-radius: 5px; position: relative; fill: inherit;"><div style="flex: 4 1 180px; padding: 12px 14px 14px; overflow: hidden; text-align: left;"><div style="font-size: 14px; line-height: 20px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 24px; margin-bottom: 2px;">Notion2Markdown联动发布Hexo博客-自动化部署方案</div><div style="font-size: 12px; line-height: 16px; color: rgba(55, 53, 47, 0.65); height: 32px; overflow: hidden;">Notion+Hexo+Github Actions自动发布方案, 终于可以解放双手啦!（本文采用Notion撰写）</div><div style="display: flex; margin-top: 6px;"><img src="https://blog.cuger.cn/images/favicon.ico"style="width: 16px; height: 16px; min-width: 16px; margin-right: 6px;"><div style="font-size: 12px; line-height: 16px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">https://blog.cuger.cn/p/634642fd/</div></div></div><div style="flex: 1 1 180px; display: block; position: relative;"><div style="position: absolute; inset: 0px;"><div style="width: 100%; height: 100%;"><img src="https://i.cuger.cn/b/7cbcf9cbaae389931abeaa2caf5f3b0e.png"referrerpolicy="same-origin"style="display: block; object-fit: cover; border-radius: 3px; width: 100%; height: 100%;"></div></div></div></a></div><div style="text-align: center; margin:0;"><p>支持撰写标题</p></div></div>
 
-1. 切换到自己在 GitHub 上托管的仓库目录
-2. 分别添加`notion_sync.yml`和`deploy.yml`
+<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;"><div style="display: flex; background:white;border-radius:5px"><a href="https://www.youtube.com/watch?v=9gXPmfLWO4U"target="_blank"rel="noopener noreferrer"style="display: flex; color: inherit; text-decoration: none; user-select: none; transition: background 20ms ease-in 0s; cursor: pointer; flex-grow: 1; min-width: 0px; flex-wrap: wrap-reverse; align-items: stretch; text-align: left; overflow: hidden; border: 1px solid rgba(55, 53, 47, 0.16); border-radius: 5px; position: relative; fill: inherit;"><div style="flex: 4 1 180px; padding: 12px 14px 14px; overflow: hidden; text-align: left;"><div style="font-size: 14px; line-height: 20px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 24px; margin-bottom: 2px;">飛來飛去的飛人事件 | 老高與小茉 Mr & Mrs Gao</div><div style="font-size: 12px; line-height: 16px; color: rgba(55, 53, 47, 0.65); height: 32px; overflow: hidden;">【加入會員按鈕】https://www.youtube.com/channel/UCMUnInmOkrWN4gof9KlhNmQ/join【訂閱頻道按鈕】https://goo.gl/VhzZeS------------------------------------------------相關鏈接：超出你想象的...</div><div style="display: flex; margin-top: 6px;"><img src="https://www.youtube.com/s/desktop/b83f134a/img/favicon.ico"style="width: 16px; height: 16px; min-width: 16px; margin-right: 6px;"><div style="font-size: 12px; line-height: 16px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">https://www.youtube.com/watch?v=9gXPmfLWO4U</div></div></div><div style="flex: 1 1 180px; display: block; position: relative;"><div style="position: absolute; inset: 0px;"><div style="width: 100%; height: 100%;"><img src="https://i.cuger.cn/b/95f30554c1ae1487793ae9603fcfcbf9.jpg"referrerpolicy="same-origin"style="display: block; object-fit: cover; border-radius: 3px; width: 100%; height: 100%;"></div></div></div></a></div><div style="text-align: center; margin:0;"><p>自动抓取页面概览，并生成图标、概览图</p></div></div>
 
-```yaml
-name: Automatic sync pages from notion
+<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;"><div style="display: flex; background:white;border-radius:5px"><a href="https://www.google.com/maps/place/Hannovermarkt/@48.2241821,16.3715072,14z/data=!4m6!3m5!1s0x476d064b379e1a9d:0xe791f1797ae7a2b8!8m2!3d48.231775!4d16.3687714!16s/g/112yfwj8x"target="_blank"rel="noopener noreferrer"style="display: flex; color: inherit; text-decoration: none; user-select: none; transition: background 20ms ease-in 0s; cursor: pointer; flex-grow: 1; min-width: 0px; flex-wrap: wrap-reverse; align-items: stretch; text-align: left; overflow: hidden; border: 1px solid rgba(55, 53, 47, 0.16); border-radius: 5px; position: relative; fill: inherit;"><div style="flex: 4 1 180px; padding: 12px 14px 14px; overflow: hidden; text-align: left;"><div style="font-size: 14px; line-height: 20px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 24px; margin-bottom: 2px;">Hannovermarkt · Hannovermarkt 1, 1200 Wien, Austria</div><div style="font-size: 12px; line-height: 16px; color: rgba(55, 53, 47, 0.65); height: 32px; overflow: hidden;">★★★★☆ · Market</div><div style="display: flex; margin-top: 6px;"><img src="https://www.google.com/images/branding/product/ico/maps15_bnuw3a_32dp.ico"style="width: 16px; height: 16px; min-width: 16px; margin-right: 6px;"><div style="font-size: 12px; line-height: 16px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">https://www.google.com/maps/place/Hannovermarkt/@48.2241821,16.3715072,14z/data=!4m6!3m5!1s0x476d064b379e1a9d:0xe791f1797ae7a2b8!8m2!3d48.231775!4d16.3687714!16s/g/112yfwj8x</div></div></div><div style="flex: 1 1 180px; display: block; position: relative;"><div style="position: absolute; inset: 0px;"><div style="width: 100%; height: 100%;"><img src="https://i.cuger.cn/b/8687d1378e367273c2c441761d66f51b.jpg"referrerpolicy="same-origin"style="display: block; object-fit: cover; border-radius: 3px; width: 100%; height: 100%;"></div></div></div></a></div><div style="text-align: center; margin:0;"><p>Google Map [link_preview]</p></div></div>
 
-on:
-#   push:
-#     branches: master
-  workflow_dispatch:
-  schedule:
-    - cron: "5 */1 * * *"
+<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;"><div style="display: flex; background:white;border-radius:5px"><a href="https://j.map.baidu.com/71/1O"target="_blank"rel="noopener noreferrer"style="display: flex; color: inherit; text-decoration: none; user-select: none; transition: background 20ms ease-in 0s; cursor: pointer; flex-grow: 1; min-width: 0px; flex-wrap: wrap-reverse; align-items: stretch; text-align: left; overflow: hidden; border: 1px solid rgba(55, 53, 47, 0.16); border-radius: 5px; position: relative; fill: inherit;"><div style="flex: 4 1 180px; padding: 12px 14px 14px; overflow: hidden; text-align: left;"><div style="font-size: 14px; line-height: 20px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 24px; margin-bottom: 2px;">百度地图</div><div style="font-size: 12px; line-height: 16px; color: rgba(55, 53, 47, 0.65); height: 32px; overflow: hidden;">浏览地图、搜索地点、查询公交驾车线路、查看实时路况，您的出行指南、生活助手。提供地铁线路图浏览，乘车方案查询，以及准确的票价和时间信息。</div><div style="display: flex; margin-top: 6px;"><img src=""style="width: 16px; height: 16px; min-width: 16px; margin-right: 6px;"><div style="font-size: 12px; line-height: 16px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">https://j.map.baidu.com/71/1O</div></div></div></a></div><div style="text-align: center; margin:0;"><p>百度地图 [link_preview]</p></div></div>
 
-permissions:
-  contents: write
+## link_preview
 
-jobs:
-  notionSyncTask:
-    name: Ubuntu and node ${{ matrix.node_version }} and ${{ matrix.os }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node_version: [16.x]
-    outputs:
-      HAS_CHANGES: ${{ steps.checkStep.outputs.HAS_CHANGES }}
+从网页抓取信息，目前暂只支持 GitHub 站点。
 
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3
-      - name: Use Node.js ${{ matrix.node_version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node_version }}
-      - name: Convert notion to markdown
-        uses: Doradx/notion2markdown-action@latest
-        with:
-          notion_secret: ${{ secrets.NOTION_TOKEN }} # NOTION授权码
-          database_id: ${{ secrets.NOTION_DATABASE_ID }} # Dataset ID
-          migrate_image: true
-          picBedConfig: ${{ secrets.PICBED_CONFIG}} # picBed的配置，JSON格式，建议为minify JSON, 否则可能报错. 不同图床的配置可参考：https://picgo.github.io/PicGo-Core-Doc/zh/guide/config.html#picbed
-          # 图床基础链接, 可留空。如填写，在图片上传图床前，会检查该图片是否已经上传过，如已上传则跳过，提升效率。
-					pic_base_url: "" # 改成你的链接，例如你图床的图片链接为：https://i.blog.com/image/xxxx.jpg, 则此处填写https://i.blog.com/image/
-					page_output_dir: 'source' # page 类文章的输出目录，例如about。
-          post_output_dir: 'source/_posts/notion' # post 的输出目录，切记当clean_unpublished_post为true时，勿设置为 'source/_posts', 可能会删除你原目录下的文章！！！
-          clean_unpublished_post: true # 是否清除未发表的文章，例如之前发表了，你又在notion中给移到草稿箱了.
-      - name: Check if there is anything changed
-        id: checkStep
-        run: |
-          if [[ -n "$(git status --porcelain)" ]]; then
-            echo "HAS_CHANGES=true" >> $GITHUB_OUTPUT;
-            echo "Updates available & redeployment required."
-          else
-            echo "HAS_CHANGES=false" >> $GITHUB_OUTPUT;
-            echo "Nothing to commit & deploy."
-          fi
-      - name: Commit & Push
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Automatic sync from notion.
-  callDepolyTask:
-    name: Call the depoly workflow
-    needs: notionSyncTask
-    if: ${{ needs.notionSyncTask.outputs.HAS_CHANGES=='true' }}
-    uses: Doradx/hexo-blog/.github/workflows/deploy.yml@master # 根据自身Github地址修改即可
-```
+<div style="margin:5px 1px;"> <a href="https://github.com/souvikinator/notion-to-md" target="_blank" rel="noopener noreferrer" style="display:flex;color:inherit;background:#f5f5f5;text-decoration:none;user-select:none;transition:background 20ms ease-in 0s;cursor:pointer;flex-grow:1;min-width:0;align-items:center;border:1px solid rgba(55,53,47,.16);border-radius:5px;padding:6px;fill:inherit"><div style="display:flex;align-self:start;height:32px;width:32px;margin:3px 12px 3px 4px;position:relative"><div><div style="width:100%;height:100%"><img src="https://i.cuger.cn/b/8f0ff9e47687cc992687822acf05378e.png" referrerpolicy="same-origin" style="display:block;object-fit:cover;border-radius:34px;width:30.192px;height:30.192px;transition:opacity .1s ease-out 0s;box-shadow:rgba(15,15,15,.1) 0 2px 4px"></div></div><div style="position:absolute;bottom:-2px;right:-2px"><div style="width:100%;height:100%"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 496 512" style="display:block;object-fit:cover;border-radius:5px;width:14.208px;height:14.208px;transition:opacity .1s ease-out 0s;filter:drop-shadow(white 0 0 1px) drop-shadow(white 0 0 1px) drop-shadow(white 0 0 1px)"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg></div></div></div><div style="display:flex;flex-direction:column;justify-content:center;flex-grow:1;flex-shrink:1;overflow:hidden"><div style="display:flex;align-items:baseline;font-size:14px"><div spellcheck="false" style="white-space:nowrap;color:#37352f;font-weight:500;overflow:hidden;text-overflow:ellipsis">souvikinator/notion-to-md</div></div><div style="display:flex;align-items:center;color:rgba(55,53,47,.65);font-size:12px"><div spellcheck="false" style="white-space:nowrap;color:rgba(55,53,47,.65)">souvikinator</div><span style="margin-left:3px;margin-right:3px">•</span><div style="color:rgba(55,53,47,.65);font-size:12px;white-space:nowrap">Created: 2021-12-04T13:11:08Z</div></div></div><div role="button" tabindex="0" style="user-select:none;transition:background 20ms ease-in 0s;cursor:pointer;opacity:0;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:5px;flex-shrink:0;margin-right:4px;color:rgba(55,53,47,.65)"><svg viewbox="0 0 13 3" class="dots" style="width:14px;height:100%;display:block;fill:inherit;flex-shrink:0;backface-visibility:hidden;color:rgba(55,53,47,.45)"><g><path d="M3,1.5A1.5,1.5,0,1,1,1.5,0,1.5,1.5,0,0,1,3,1.5Z"></path><path d="M8,1.5A1.5,1.5,0,1,1,6.5,0,1.5,1.5,0,0,1,8,1.5Z"></path><path d="M13,1.5A1.5,1.5,0,1,1,11.5,0,1.5,1.5,0,0,1,13,1.5Z"></path></g></svg></div></a></div>
 
-```yaml
-name: Automatic deployment of Dorad's Blog -> Tencent COS
+<div style="margin:5px 1px;"> <a href="https://github.com/ant-design/ant-design/issues" target="_blank" rel="noopener noreferrer" style="display:flex;color:inherit;background:#f5f5f5;text-decoration:none;user-select:none;transition:background 20ms ease-in 0s;cursor:pointer;flex-grow:1;min-width:0;align-items:center;border:1px solid rgba(55,53,47,.16);border-radius:5px;padding:6px;fill:inherit"><div style="display:flex;align-self:start;height:32px;width:32px;margin:3px 12px 3px 4px;position:relative"><div><div style="width:100%;height:100%"><img src="https://i.cuger.cn/b/ebee23608f894f1a45e817adafc0998d.png" referrerpolicy="same-origin" style="display:block;object-fit:cover;border-radius:34px;width:30.192px;height:30.192px;transition:opacity .1s ease-out 0s;box-shadow:rgba(15,15,15,.1) 0 2px 4px"></div></div><div style="position:absolute;bottom:-2px;right:-2px"><div style="width:100%;height:100%"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 496 512" style="display:block;object-fit:cover;border-radius:5px;width:14.208px;height:14.208px;transition:opacity .1s ease-out 0s;filter:drop-shadow(white 0 0 1px) drop-shadow(white 0 0 1px) drop-shadow(white 0 0 1px)"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg></div></div></div><div style="display:flex;flex-direction:column;justify-content:center;flex-grow:1;flex-shrink:1;overflow:hidden"><div style="display:flex;align-items:baseline;font-size:14px"><div spellcheck="false" style="white-space:nowrap;color:#37352f;font-weight:500;overflow:hidden;text-overflow:ellipsis">ant-design/ant-design  Issues</div></div><div style="display:flex;align-items:center;color:rgba(55,53,47,.65);font-size:12px"><div spellcheck="false" style="white-space:nowrap;color:rgba(55,53,47,.65)">ant-design</div><span style="margin-left:3px;margin-right:3px">•</span><div style="color:rgba(55,53,47,.65);font-size:12px;white-space:nowrap">Created: 2015-04-24T15:37:24Z</div></div></div><div role="button" tabindex="0" style="user-select:none;transition:background 20ms ease-in 0s;cursor:pointer;opacity:0;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:5px;flex-shrink:0;margin-right:4px;color:rgba(55,53,47,.65)"><svg viewbox="0 0 13 3" class="dots" style="width:14px;height:100%;display:block;fill:inherit;flex-shrink:0;backface-visibility:hidden;color:rgba(55,53,47,.45)"><g><path d="M3,1.5A1.5,1.5,0,1,1,1.5,0,1.5,1.5,0,0,1,3,1.5Z"></path><path d="M8,1.5A1.5,1.5,0,1,1,6.5,0,1.5,1.5,0,0,1,8,1.5Z"></path><path d="M13,1.5A1.5,1.5,0,1,1,11.5,0,1.5,1.5,0,0,1,13,1.5Z"></path></g></svg></div></a></div>
 
-on:
-  push:
-    branches: master
-    paths:
-      - "source/**"
-      - "**.yml"
-  workflow_dispatch:
-  workflow_call:
+<div style="margin:5px 1px;"> <a href="https://github.com/ant-design/ant-design/issues/41885" target="_blank" rel="noopener noreferrer" style="display:flex;color:inherit;background:#f5f5f5;text-decoration:none;user-select:none;transition:background 20ms ease-in 0s;cursor:pointer;flex-grow:1;min-width:0;align-items:center;border:1px solid rgba(55,53,47,.16);border-radius:5px;padding:6px;fill:inherit"><div style="display:flex;align-self:start;height:32px;width:32px;margin:3px 12px 3px 4px;position:relative"><div><div style="width:100%;height:100%"><img src="https://i.cuger.cn/b/a4cd12051dfc319d2480591cea2615e0.jpg" referrerpolicy="same-origin" style="display:block;object-fit:cover;border-radius:34px;width:30.192px;height:30.192px;transition:opacity .1s ease-out 0s;box-shadow:rgba(15,15,15,.1) 0 2px 4px"></div></div><div style="position:absolute;bottom:-2px;right:-2px"><div style="width:100%;height:100%"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 496 512" style="display:block;object-fit:cover;border-radius:5px;width:14.208px;height:14.208px;transition:opacity .1s ease-out 0s;filter:drop-shadow(white 0 0 1px) drop-shadow(white 0 0 1px) drop-shadow(white 0 0 1px)"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg></div></div></div><div style="display:flex;flex-direction:column;justify-content:center;flex-grow:1;flex-shrink:1;overflow:hidden"><div style="display:flex;align-items:baseline;font-size:14px"><div spellcheck="false" style="white-space:nowrap;color:#37352f;font-weight:500;overflow:hidden;text-overflow:ellipsis">App.useApp().message 动态自定义主题样式有误 <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12.5" height="12.5"><path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"></path><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"></path></svg><span style="margin-left:3px;margin-right:3px">•</span>#41885<span style="margin-left:3px;margin-right:3px">•</span>Open</div></div><div style="display:flex;align-items:center;color:rgba(55,53,47,.65);font-size:12px"><div spellcheck="false" style="white-space:nowrap;color:rgba(55,53,47,.65)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12.5" height="12.5"><path d="M8 9.5a1.5 1.5 0 1 0 0-3 1.5 1.5 0 0 0 0 3Z"></path><path d="M8 0a8 8 0 1 1 0 16A8 8 0 0 1 8 0ZM1.5 8a6.5 6.5 0 1 0 13 0 6.5 6.5 0 0 0-13 0Z"></path></svg><span style="margin-left:3px;margin-right:3px">•</span>#41885<span style="margin-left:3px;margin-right:3px">•</span>onlyling</div><span style="margin-left:3px;margin-right:3px">•</span><div style="color:rgba(55,53,47,.65);font-size:12px;white-space:nowrap">Created: 2023-04-19T08:03:13Z</div></div></div><div role="button" tabindex="0" style="user-select:none;transition:background 20ms ease-in 0s;cursor:pointer;opacity:0;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:5px;flex-shrink:0;margin-right:4px;color:rgba(55,53,47,.65)"><svg viewbox="0 0 13 3" class="dots" style="width:14px;height:100%;display:block;fill:inherit;flex-shrink:0;backface-visibility:hidden;color:rgba(55,53,47,.45)"><g><path d="M3,1.5A1.5,1.5,0,1,1,1.5,0,1.5,1.5,0,0,1,3,1.5Z"></path><path d="M8,1.5A1.5,1.5,0,1,1,6.5,0,1.5,1.5,0,0,1,8,1.5Z"></path><path d="M13,1.5A1.5,1.5,0,1,1,11.5,0,1.5,1.5,0,0,1,13,1.5Z"></path></g></svg></div></a></div>
 
-env:
-  GIT_USER: Dorad
-  GIT_EMAIL: ddxid@outlook.com
+<div style="margin:5px 1px;"> <a href="https://github.com/ant-design/ant-design/pulls" target="_blank" rel="noopener noreferrer" style="display:flex;color:inherit;background:#f5f5f5;text-decoration:none;user-select:none;transition:background 20ms ease-in 0s;cursor:pointer;flex-grow:1;min-width:0;align-items:center;border:1px solid rgba(55,53,47,.16);border-radius:5px;padding:6px;fill:inherit"><div style="display:flex;align-self:start;height:32px;width:32px;margin:3px 12px 3px 4px;position:relative"><div><div style="width:100%;height:100%"><img src="https://i.cuger.cn/b/ebee23608f894f1a45e817adafc0998d.png" referrerpolicy="same-origin" style="display:block;object-fit:cover;border-radius:34px;width:30.192px;height:30.192px;transition:opacity .1s ease-out 0s;box-shadow:rgba(15,15,15,.1) 0 2px 4px"></div></div><div style="position:absolute;bottom:-2px;right:-2px"><div style="width:100%;height:100%"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 496 512" style="display:block;object-fit:cover;border-radius:5px;width:14.208px;height:14.208px;transition:opacity .1s ease-out 0s;filter:drop-shadow(white 0 0 1px) drop-shadow(white 0 0 1px) drop-shadow(white 0 0 1px)"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg></div></div></div><div style="display:flex;flex-direction:column;justify-content:center;flex-grow:1;flex-shrink:1;overflow:hidden"><div style="display:flex;align-items:baseline;font-size:14px"><div spellcheck="false" style="white-space:nowrap;color:#37352f;font-weight:500;overflow:hidden;text-overflow:ellipsis">ant-design/ant-design  Pulls</div></div><div style="display:flex;align-items:center;color:rgba(55,53,47,.65);font-size:12px"><div spellcheck="false" style="white-space:nowrap;color:rgba(55,53,47,.65)">ant-design</div><span style="margin-left:3px;margin-right:3px">•</span><div style="color:rgba(55,53,47,.65);font-size:12px;white-space:nowrap">Created: 2015-04-24T15:37:24Z</div></div></div><div role="button" tabindex="0" style="user-select:none;transition:background 20ms ease-in 0s;cursor:pointer;opacity:0;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:5px;flex-shrink:0;margin-right:4px;color:rgba(55,53,47,.65)"><svg viewbox="0 0 13 3" class="dots" style="width:14px;height:100%;display:block;fill:inherit;flex-shrink:0;backface-visibility:hidden;color:rgba(55,53,47,.45)"><g><path d="M3,1.5A1.5,1.5,0,1,1,1.5,0,1.5,1.5,0,0,1,3,1.5Z"></path><path d="M8,1.5A1.5,1.5,0,1,1,6.5,0,1.5,1.5,0,0,1,8,1.5Z"></path><path d="M13,1.5A1.5,1.5,0,1,1,11.5,0,1.5,1.5,0,0,1,13,1.5Z"></path></g></svg></div></a></div>
 
-jobs:
-  build:
-    name: Ubuntu and node ${{ matrix.node_version }} and ${{ matrix.os }}
-    runs-on: ubuntu-latest
-    strategy:
-      matrix:
-        os: [ubuntu-latest]
-        node_version: [14.x]
+<div style="margin:5px 1px;"> <a href="https://github.com/ant-design/ant-design/pull/41890" target="_blank" rel="noopener noreferrer" style="display:flex;color:inherit;background:#f5f5f5;text-decoration:none;user-select:none;transition:background 20ms ease-in 0s;cursor:pointer;flex-grow:1;min-width:0;align-items:center;border:1px solid rgba(55,53,47,.16);border-radius:5px;padding:6px;fill:inherit"><div style="display:flex;align-self:start;height:32px;width:32px;margin:3px 12px 3px 4px;position:relative"><div><div style="width:100%;height:100%"><img src="https://i.cuger.cn/b/6bbd6435e3ea1faa3369dd981e47047b.jpg" referrerpolicy="same-origin" style="display:block;object-fit:cover;border-radius:34px;width:30.192px;height:30.192px;transition:opacity .1s ease-out 0s;box-shadow:rgba(15,15,15,.1) 0 2px 4px"></div></div><div style="position:absolute;bottom:-2px;right:-2px"><div style="width:100%;height:100%"><svg xmlns="http://www.w3.org/2000/svg" viewbox="0 0 496 512" style="display:block;object-fit:cover;border-radius:5px;width:14.208px;height:14.208px;transition:opacity .1s ease-out 0s;filter:drop-shadow(white 0 0 1px) drop-shadow(white 0 0 1px) drop-shadow(white 0 0 1px)"><path d="M165.9 397.4c0 2-2.3 3.6-5.2 3.6-3.3.3-5.6-1.3-5.6-3.6 0-2 2.3-3.6 5.2-3.6 3-.3 5.6 1.3 5.6 3.6zm-31.1-4.5c-.7 2 1.3 4.3 4.3 4.9 2.6 1 5.6 0 6.2-2s-1.3-4.3-4.3-5.2c-2.6-.7-5.5.3-6.2 2.3zm44.2-1.7c-2.9.7-4.9 2.6-4.6 4.9.3 2 2.9 3.3 5.9 2.6 2.9-.7 4.9-2.6 4.6-4.6-.3-1.9-3-3.2-5.9-2.9zM244.8 8C106.1 8 0 113.3 0 252c0 110.9 69.8 205.8 169.5 239.2 12.8 2.3 17.3-5.6 17.3-12.1 0-6.2-.3-40.4-.3-61.4 0 0-70 15-84.7-29.8 0 0-11.4-29.1-27.8-36.6 0 0-22.9-15.7 1.6-15.4 0 0 24.9 2 38.6 25.8 21.9 38.6 58.6 27.5 72.9 20.9 2.3-16 8.8-27.1 16-33.7-55.9-6.2-112.3-14.3-112.3-110.5 0-27.5 7.6-41.3 23.6-58.9-2.6-6.5-11.1-33.3 2.6-67.9 20.9-6.5 69 27 69 27 20-5.6 41.5-8.5 62.8-8.5s42.8 2.9 62.8 8.5c0 0 48.1-33.6 69-27 13.7 34.7 5.2 61.4 2.6 67.9 16 17.7 25.8 31.5 25.8 58.9 0 96.5-58.9 104.2-114.8 110.5 9.2 7.9 17 22.9 17 46.4 0 33.7-.3 75.4-.3 83.6 0 6.5 4.6 14.4 17.3 12.1C428.2 457.8 496 362.9 496 252 496 113.3 383.5 8 244.8 8zM97.2 352.9c-1.3 1-1 3.3.7 5.2 1.6 1.6 3.9 2.3 5.2 1 1.3-1 1-3.3-.7-5.2-1.6-1.6-3.9-2.3-5.2-1zm-10.8-8.1c-.7 1.3.3 2.9 2.3 3.9 1.6 1 3.6.7 4.3-.7.7-1.3-.3-2.9-2.3-3.9-2-.6-3.6-.3-4.3.7zm32.4 35.6c-1.6 1.3-1 4.3 1.3 6.2 2.3 2.3 5.2 2.6 6.5 1 1.3-1.3.7-4.3-1.3-6.2-2.2-2.3-5.2-2.6-6.5-1zm-11.4-14.7c-1.6 1-1.6 3.6 0 5.9 1.6 2.3 4.3 3.3 5.6 2.3 1.6-1.3 1.6-3.9 0-6.2-1.4-2.3-4-3.3-5.6-2z"></path></svg></div></div></div><div style="display:flex;flex-direction:column;justify-content:center;flex-grow:1;flex-shrink:1;overflow:hidden"><div style="display:flex;align-items:baseline;font-size:14px"><div spellcheck="false" style="white-space:nowrap;color:#37352f;font-weight:500;overflow:hidden;text-overflow:ellipsis">site: time changed to dynamic <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12.5" height="12.5"><path d="M1.5 3.25a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25Zm5.677-.177L9.573.677A.25.25 0 0 1 10 .854V2.5h1A2.5 2.5 0 0 1 13.5 5v5.628a2.251 2.251 0 1 1-1.5 0V5a1 1 0 0 0-1-1h-1v1.646a.25.25 0 0 1-.427.177L7.177 3.427a.25.25 0 0 1 0-.354ZM3.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm0 9.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm8.25.75a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Z"></path></svg><span style="margin-left:3px;margin-right:3px">•</span>#41890<span style="margin-left:3px;margin-right:3px">•</span>Open</div></div><div style="display:flex;align-items:center;color:rgba(55,53,47,.65);font-size:12px"><div spellcheck="false" style="white-space:nowrap;color:rgba(55,53,47,.65)"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 16 16" width="12.5" height="12.5"><path d="M1.5 3.25a2.25 2.25 0 1 1 3 2.122v5.256a2.251 2.251 0 1 1-1.5 0V5.372A2.25 2.25 0 0 1 1.5 3.25Zm5.677-.177L9.573.677A.25.25 0 0 1 10 .854V2.5h1A2.5 2.5 0 0 1 13.5 5v5.628a2.251 2.251 0 1 1-1.5 0V5a1 1 0 0 0-1-1h-1v1.646a.25.25 0 0 1-.427.177L7.177 3.427a.25.25 0 0 1 0-.354ZM3.75 2.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm0 9.5a.75.75 0 1 0 0 1.5.75.75 0 0 0 0-1.5Zm8.25.75a.75.75 0 1 0 1.5 0 .75.75 0 0 0-1.5 0Z"></path></svg><span style="margin-left:3px;margin-right:3px">•</span>#41890<span style="margin-left:3px;margin-right:3px">•</span>bilibili-ayang</div><span style="margin-left:3px;margin-right:3px">•</span><div style="color:rgba(55,53,47,.65);font-size:12px;white-space:nowrap">Created: 2023-04-19T09:36:14Z</div></div></div><div role="button" tabindex="0" style="user-select:none;transition:background 20ms ease-in 0s;cursor:pointer;opacity:0;display:flex;align-items:center;justify-content:center;width:28px;height:28px;border-radius:5px;flex-shrink:0;margin-right:4px;color:rgba(55,53,47,.65)"><svg viewbox="0 0 13 3" class="dots" style="width:14px;height:100%;display:block;fill:inherit;flex-shrink:0;backface-visibility:hidden;color:rgba(55,53,47,.45)"><g><path d="M3,1.5A1.5,1.5,0,1,1,1.5,0,1.5,1.5,0,0,1,3,1.5Z"></path><path d="M8,1.5A1.5,1.5,0,1,1,6.5,0,1.5,1.5,0,0,1,8,1.5Z"></path><path d="M13,1.5A1.5,1.5,0,1,1,11.5,0,1.5,1.5,0,0,1,13,1.5Z"></path></g></svg></div></a></div>
 
-    steps:
-      - name: Checkout blog and theme
-        uses: actions/checkout@v3
-        with:
-          submodules: "recursive"
-      - name: Use Node.js ${{ matrix.node_version }}
-        uses: actions/setup-node@v3
-        with:
-          node-version: ${{ matrix.node_version }}
-      - name: Install dependencies
-        run: |
-          git pull
-          npm install
-      - name: Depoly
-        run: |
-          npm run clean
-          gulp
-          npm run build
-          npm run deploy
-      - name: Commit & Push
-        uses: stefanzweifel/git-auto-commit-action@v4
-        with:
-          commit_message: Automatic deployment.
-```
+## video
 
-### GitHub Action 环境变量配置
+<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;"><iframe src="https://www.youtube.com/embed/9gXPmfLWO4U" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width: 100%; margin:0; aspect-ratio: 16/9;"> </iframe><div style="text-align: center; margin:0;"><p>YouTube</p></div></div>
 
-前往博客仓库的`settings/secrets/actions`中添加环境变量，核心为`NOTION_DATABASE_ID`, `NOTION_TOKEN`和`PICBED_CONFIG`。
+## bilibili
 
-![配置完成的GITHUB ACTION环境变量](https://i.cuger.cn/b/7091f2333e1ba7a774f4c5313a738fd2.png)
+<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;"><iframe src="//player.bilibili.com/player.html?bvid=BV1e24y1D7qt&page=1&autoplay=0" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width: 100%; margin:0; aspect-ratio: 16/9;"> </iframe><div style="text-align: center; margin:0;"><p>Bilibili</p></div></div>
 
-其中，
+<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;"><iframe src="https://v.qq.com/txp/iframe/player.html?vid=cover" scrolling="no" border="0" frameborder="no" framespacing="0" allowfullscreen="true" style="width: 100%; margin:0; aspect-ratio: 16/9;"> </iframe><div style="text-align: center; margin:0;"><p>腾讯视频</p></div></div>
 
-- `NOTION_DATABASE_ID`：`Notion Dataset`的页面 ID，在`Notion Dataset`主页中点击`Copy Link`，得到链接，例如：[https://www.notion.so/doradx/397943b2d0384e15ba69448900823984?v=06762d5d3e2140e399c03d84131ee682](/397943b2d0384e15ba69448900823984?v=06762d5d3e2140e399c03d84131ee682)，其中`397943b2d0384e15ba69448900823984`便是此`Dataset`的 ID。
-- `NOTION_TOKEN`：在此前获取的`Notion Integration`的**`Secrets`**，直达链接：[My integrations | Notion Developers](https://www.notion.so/my-integrations)
-- `PICBED_CONFIG`：图床的配置文件，JSON 格式，由于图床使用的是[PicGo-Core](https://picgo.github.io/PicGo-Core-Doc/), 其配置保持相同，但只需要`picBed`部分，不同图床的配置方式详见：[配置文件 | PicGo-Core](https://picgo.github.io/PicGo-Core-Doc/zh/guide/config.html#%E6%89%8B%E5%8A%A8%E7%94%9F%E6%88%90)
+## embed
 
-以腾讯云 COS 为例，`PICBED_CONFIG`的格式为：
+[embed](https://twitter.com/engineers_feed/status/1648224909628428288/photo/1?ref_src=twsrc^tfw|twcamp^tweetembed|twterm^1648224909628428288|twgr^|twcon^s1_&ref_url=notion://www.notion.so/doradx/7d38e2effd254f808799dc93913dc2a9?v=06ad62c0f1d349b19b4ad78053390655p=21add53e02ad4376b46147b5edc4fc1apm=s)
 
-```json
-{
-    "uploader": "tcyun", // 代表当前的默认上传图床为,
-    "tcyun":
-    {
-        "secretId": "",
-        "secretKey": "",
-        "bucket": "", // 存储桶名，v4 和 v5 版本不一样
-        "appId": "",
-        "area": "", // 存储区域，例如 ap-beijing-1
-        "path": "", // 自定义存储路径，比如 img/
-        "customUrl": "", // 自定义域名，注意要加 http://或者 https://
-        "version": "v5" | "v4" // COS 版本，v4 或者 v5
-    }
-}
-```
+<div style="width: 100%; margin: 0 0 2px;"><iframe src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d21256.76887975903!2d16.3559718!3d48.243277299999995!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x476d062528ea2d5d:0xdb9469453e663848!2sSetagaya Park!5e0!3m2!1szh-CN!2sat!4v1681867481910!5m2!1szh-CN!2sat" style="width: 100%; margin:0; aspect-ratio: 16/9;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><div style="text-align: center; margin:0;"><p>Google Map [embed]</p></div></div>
 
-如需使用不同图床，直接修改`uploader`字段，并配置相应的参数即可。以下提供几种常见图床的配置文件案例：
+<div style="width: 100%; margin: 0 0 2px;"><iframe src="https://surl.amap.com/7iBTXR21j5sx" style="width: 100%; margin:0; aspect-ratio: 16/9;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><div style="text-align: center; margin:0;"><p>高德地图</p></div></div>
 
-- `qiniu`
+<div style="width: 100%; margin: 0 0 2px;"><iframe src="https://j.map.baidu.com/71/1O" style="width: 100%; margin:0; aspect-ratio: 16/9;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe><div style="text-align: center; margin:0;"><p>百度地图</p></div></div>
 
-```json
-{
-    "uploader": "qiniu", // 代表当前的默认上传图床为,
-    "qiniu":
-    {
-        "accessKey": "",
-        "secretKey": "",
-        "bucket": "", // 存储空间名
-        "url": "", // 自定义域名
-        "area": "z0" | "z1" | "z2" | "na0" | "as0", // 存储区域编号
-        "options": "", // 网址后缀，比如？imgslim
-        "path": "" // 自定义存储路径，比如 img/
-    }
-}
-```
+## pdf
 
-- `aliyun`
-
-```json
-{
-  "uploader": "aliyun", // 代表当前的默认上传图床,
-  "aliyun": {
-    "accessKeyId": "",
-    "accessKeySecret": "",
-    "bucket": "", // 存储空间名
-    "area": "", // 存储区域代号
-    "path": "", // 自定义存储路径
-    "customUrl": "", // 自定义域名，注意要加 http://或者 https://
-    "options": "" // 针对图片的一些后缀处理参数 PicGo 2.2.0+ PicGo-Core 1.4.0+
-  }
-}
-```
-
-- `github`
-
-```json
-{
-  "uploader": "github", // 代表当前的默认上传图床,
-  "github": {
-    "repo": "", // 仓库名，格式是 username/reponame
-    "token": "", // github token
-    "path": "", // 自定义存储路径，比如 img/
-    "customUrl": "", // 自定义域名，注意要加 http://或者 https://
-    "branch": "" // 分支名，默认是 main
-  }
-}
-```
-
-## 测试效果
-
-前往仓库的`Actions`页面，选择`Automatic sync pages from notion`，进行测试手动部署，并查看运行情况。
-
-![手动触发，查看运行结果](https://i.cuger.cn/b/36ef3d31bc346b85e7c450b1ea5cd0f1.png)
-
-搞定！尽情享受写作吧！
-
-# 完整版配置文件及说明
-
-[`notion2markdown`](https://github.com/Doradx/notion2markdown-action)提供了众多配置参数，以满足各类需求，以下为根据此 action 的配置文件，撰写的参数说明。
-
-````yaml
-name: "notion2markdown-action"
-description: |
-  将 notion database 中的 page 转换为 markdown 文档，可以用于 hexo、hugo 等静态博客构建, 内置picgo-core,使用picBed上传图床。
-inputs:
-  notion_secret: # id of input
-    description: notion app token，建议最好放到 Action Secret 中
-    required: true
-  database_id:
-    required: true
-    description: |
-      notion 中的数据库 id
-      - 假设你的数据库页面链接是 `https://www.notion.so/you-name/0f3d856498ca4db3b457c5b4eeaxxxxx`
-      - 那么 `database_id=0f3d856498ca4db3b457c5b4eeaxxxxx`
-  status_name:
-    description: notion database 状态字段的字段名，支持自定义
-    default: "status"
-  status_published:
-    description: notion database 文章已发布状态的字段值
-    default: "已发布"
-  status_unpublish:
-    description: |
-      notion database 文章待发布状态的字段值
-      触发 action 后会自动拉去所有该状态的文章，成功导出之后会把这篇文章的状态修改为上面设置的已发布状态
-    default: "待发布"
-  migrate_image:
-    required: false
-    description: |
-      是否迁移图片到图床
-      注意: 如果不迁移图片默认导出图片链接是 notion 的自带链接，有访问时效
-      目前支持迁移图片到多类图床中，采用的是PicGO-Core.
-    default: "true"
-  picBedConfig:
-    description: |
-      picgo-core中picBed配置文件, 支持多类型图床。
-      example:
-      ```
-      "current": "smms",
-      "uploader": "smms", // 代表当前的默认上传图床为 SM.MS,
-      "smms": {
-        "token": "" // 从 https://sm.ms/home/apitoken 获取的 token
-      }
-      "aliyun":{
-        "accessKeyId": "",
-        "accessKeySecret": "",
-        "bucket": "", // 存储空间名
-        "area": "", // 存储区域代号
-        "path": "", // 自定义存储路径
-        "customUrl": "", // 自定义域名，注意要加 http://或者 https://
-        "options": "" // 针对图片的一些后缀处理参数 PicGo 2.2.0+ PicGo-Core 1.4.0+
-      },
-      "tcyun":{
-        "secretId": "",
-        "secretKey": "",
-        "bucket": "", // 存储桶名，v4 和 v5 版本不一样
-        "appId": "",
-        "area": "", // 存储区域，例如 ap-beijing-1
-        "path": "", // 自定义存储路径，比如 img/
-        "customUrl": "", // 自定义域名，注意要加 http://或者 https://
-        "version": "v5" | "v4" // COS 版本，v4 或者 v5
-      }
-      ```
-      详见: https://picgo.github.io/PicGo-Core-Doc/zh/guide/config.html#%E6%89%8B%E5%8A%A8%E7%94%9F%E6%88%90
-    default: "{}"
-  pic_base_url:
-    description: |
-      图床的基础链接, 例如: https://i.blog.com/image/，如填写此链接，在图片上传图床前，会检查该图片是否已经上传过，如已上传则跳过，提升效率。
-    default: ""
-  page_output_dir:
-    description: page类型页面的输出文件夹
-    default: "source/"
-  post_output_dir:
-    description: post类型页面的输出文件夹
-    default: "source/_posts/notion"
-  clean_unpublished_post:
-    description: 是否清除未发表的post
-    default: "false"
-  timezone:
-    description: 设置的时区
-    default: "Asia/Shanghai"
-````
-
-# Notion 文章属性说明
-
-## 属性列表
-
-`Nation Dataset`中，每篇文章都预设了属性字段，字段说明如下：
-
-- `status`: 文章状态
-- `type`:页面类型，`post/page`, 分别对应 hexo 中的`page`和`post`, 留空则默认为`post`
-- `date`: 发表日期
-- `categories`: 分类
-- `tags`: 标签
-- `filename`: `Markdown`文件最终的文件名，可留空，默认为文章的标题
-- `description`: 文章简介
-- `abbrlink`: 静态文章链接, 此项需搭配[**hexo-abbrlink**](https://github.com/rozbo/hexo-abbrlink)使用，如果你不知道该属性的意义，可留空
-- `Created time`:　创建时间，此属性自动更新，将会被同步到`*.md`文件的 cre`ated`属性中
-- `Last edit time`：最后修改时间，此属性自动更新，将会被同步到`*.md`文件的`updated`属性中
-
-## Tips
-
-- 只有状态为`待发布`的文章才会被`Github Action`转为`Markdown`
-- `Notion`上设置的`文章封面`会被用作文章的`cover`字段，并上传图床
-- `Notion`中每个页面会有一个独一无二的 UID, 为方便管理，此 ID 会被同步到`*.md`文件的`id`属性
-- `Notion`中每个页面会有`created_time`和`last_edited_time`, 会被分别同步到`*.md`文件的`created`和`updated`属性
-- `Notion Dataset`中，使用`status`进行阶段管理，其中只有处于`待发布`状态的文章会被自动处理。所以，只需要保证`待发布`和`已发布`两个状态存在即可，其它几个状态可以根据喜好修改或删除；
-- `Notion Dataset`中，每篇文章都设置了众多属性，其均会写入到最终`Markdown`文件头部的 YAML 配置中，可根据自身需要添加属性，但注意字段名最好不要有特殊字符，否则可能出错；
-- 使用`hexo`的童鞋，如**部署过慢**，建议升级`hexo`版本，并**清理项目依赖**（在`package.json`中），可极大提升部署效率。博主升级后时间缩短了一半，目前约`90s内`能完成部署。
-
-## Actions 耗时分析
-
-### notion_sync.yml
-
-对于此任务，最耗时的部分在于图床上传，具体耗时与图片数量和`GitHub Actions`的具体执行机器有关（每次机器都不一样）。
-
-由于是每小时轮询，当查到 Notion 无需要发布的文献时候
-
-> 本文处理耗时约`17s`，各任务为并行，取决于执行机器网速和图片数量。此步骤主要瓶颈在于 GitHub 上传图床速度，可优化面较小。。。或许用 GitHub 做图床会非常快？利好图床采用外网平台的童鞋。
-
-### deploy.yml
-
-此任务最大耗时在依赖安装(`Install dependencies`)和部署(`Deploy`)：
-
-- 升级`Hexo`到最新版`v6.3.0`，并清理`package.json`中无用的包后，依赖安装约耗时`20s`
-- 部署部分主要还是网络问题，速度取决于你的部署类型，博主使用腾讯云 COS，单次部署上传约`30s`
-
-> 单次部署的典型耗时约`1min`
+<div class="pdf"><iframe src="https://www.africau.edu/images/default/sample.pdf" style="width: 100%; margin:0; aspect-ratio: 16/9;"></iframe><div style="text-align: center; margin:0;"><p>在线PDF阅读</p></div></div>
 
 # Q&A
 
@@ -405,7 +101,7 @@ inputs:
 
 在`notion_sync.yml`配置中修改 `schedule`配置即可，格式为 cron，可利用[Crontab.guru](https://crontab.guru/#5_*/1_*_*_*)进行可视化调整。
 
-> 注意：不要改那么高频！GitHub 对于私有仓库，调用 GitHub Actions 的时间是有限的，Pro 用户每个月 3000 分钟。小心 GitHub 找你收钱。根据推算，建议触发间隔前往不要小于 10 分钟！
+> 注意：不要改那么高频！GitHub 对于私有仓库，调用 GitHub Actions 的时间是有限的，Pro 用户每个月 3000 分钟。小心 GitHub 找你收钱。根据推算，建议触发间隔不小于 10 分钟！
 
 - 如何嵌入 HTML 等代码？
 
@@ -447,7 +143,7 @@ inputs:
 - 功能完备，虽然有一些小坑，但`Notion`转`Markdown`功能完备
 - 自动化部署，只需要在`Notion`编辑即可，且方便管理，剩余流程全自动
 - 利用`Notion`可在多端同步编辑，图床自动上传，无需关心其它问题，转注写作即可
-- 支持各类博客，因为原理就是 Notion to Markdown，通用型极高
+- 理论上支持各类静态博客，因为原理就是`Notion to Markdown`，通用型极高
 - 可设置指定的目录存储 Notion 导出的 post, 例如: `source/_posts/notion`,不影响原先使用其它编辑器撰写的文章
 - 多处备份，`Notion+GitHub`,暂不用担心数据丢失
 
@@ -464,8 +160,15 @@ inputs:
 
 - 后期可考虑换为`Webhook`(更及时、节省资源)
 
+> 特别鸣谢[@王云子](https://wangyunzi.com/)同学协助`debug`并完善此项目。
+
+<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;"><div style="display: flex; background:white;border-radius:5px"><a href="https://wangyunzi.com/posts/notion/64/"target="_blank"rel="noopener noreferrer"style="display: flex; color: inherit; text-decoration: none; user-select: none; transition: background 20ms ease-in 0s; cursor: pointer; flex-grow: 1; min-width: 0px; flex-wrap: wrap-reverse; align-items: stretch; text-align: left; overflow: hidden; border: 1px solid rgba(55, 53, 47, 0.16); border-radius: 5px; position: relative; fill: inherit;"><div style="flex: 4 1 180px; padding: 12px 14px 14px; overflow: hidden; text-align: left;"><div style="font-size: 14px; line-height: 20px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 24px; margin-bottom: 2px;">Hexo和Notion的神级联动 | 长街短梦</div><div style="font-size: 12px; line-height: 16px; color: rgba(55, 53, 47, 0.65); height: 32px; overflow: hidden;">生活, 学习, 博客</div><div style="display: flex; margin-top: 6px;"><img src="https://wangyunzi.com/img/wangyunzi.ico"style="width: 16px; height: 16px; min-width: 16px; margin-right: 6px;"><div style="font-size: 12px; line-height: 16px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">https://wangyunzi.com/posts/notion/64/</div></div></div></a></div></div>
+
+
 # 主要参考
 
-- [`notion-blog-action`](https://github.com/mohuishou/notion-blog-actions)
-- [使用 Notion Database 管理静态博客文章 - Mohuishou (lailin.xyz)](https://lailin.xyz/post/notion-markdown-blog.html)
-- [利用 Github Actions 自动部署 Hexo 博客 | Sanonz](https://sanonz.github.io/2020/deploy-a-hexo-blog-from-github-actions/#Workflow-%E6%A8%A1%E7%89%88)
+<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;"><div style="display: flex; background:white;border-radius:5px"><a href="https://github.com/mohuishou/notion-blog-actions"target="_blank"rel="noopener noreferrer"style="display: flex; color: inherit; text-decoration: none; user-select: none; transition: background 20ms ease-in 0s; cursor: pointer; flex-grow: 1; min-width: 0px; flex-wrap: wrap-reverse; align-items: stretch; text-align: left; overflow: hidden; border: 1px solid rgba(55, 53, 47, 0.16); border-radius: 5px; position: relative; fill: inherit;"><div style="flex: 4 1 180px; padding: 12px 14px 14px; overflow: hidden; text-align: left;"><div style="font-size: 14px; line-height: 20px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 24px; margin-bottom: 2px;">GitHub - mohuishou/notion-blog-actions: convert notion database pages to markdown files for hexo or hugo</div><div style="font-size: 12px; line-height: 16px; color: rgba(55, 53, 47, 0.65); height: 32px; overflow: hidden;">convert notion database pages to markdown files for hexo or hugo - GitHub - mohuishou/notion-blog-actions: convert notion database pages to markdown files for hexo or hugo</div><div style="display: flex; margin-top: 6px;"><img src="https://i.cuger.cn/b/6d802f68df0c09a4997cfd28eeafd9ff.svg"style="width: 16px; height: 16px; min-width: 16px; margin-right: 6px;"><div style="font-size: 12px; line-height: 16px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">https://github.com/mohuishou/notion-blog-actions</div></div></div><div style="flex: 1 1 180px; display: block; position: relative;"><div style="position: absolute; inset: 0px;"><div style="width: 100%; height: 100%;"><img src="https://i.cuger.cn/b/99c5378591f4299bb60d717082f6addd.png"referrerpolicy="same-origin"style="display: block; object-fit: cover; border-radius: 3px; width: 100%; height: 100%;"></div></div></div></a></div></div>
+
+<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;"><div style="display: flex; background:white;border-radius:5px"><a href="https://lailin.xyz/post/notion-markdown-blog.html"target="_blank"rel="noopener noreferrer"style="display: flex; color: inherit; text-decoration: none; user-select: none; transition: background 20ms ease-in 0s; cursor: pointer; flex-grow: 1; min-width: 0px; flex-wrap: wrap-reverse; align-items: stretch; text-align: left; overflow: hidden; border: 1px solid rgba(55, 53, 47, 0.16); border-radius: 5px; position: relative; fill: inherit;"><div style="flex: 4 1 180px; padding: 12px 14px 14px; overflow: hidden; text-align: left;"><div style="font-size: 14px; line-height: 20px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 24px; margin-bottom: 2px;">使用 Notion Database 管理静态博客文章</div><div style="font-size: 12px; line-height: 16px; color: rgba(55, 53, 47, 0.65); height: 32px; overflow: hidden;">当博客文章变多了之后就发现，放在 hexo 的本地文件夹中管理就有些力不从心了</div><div style="display: flex; margin-top: 6px;"><img src="https://i.cuger.cn/b/5abdd589f053abd6857a2967ec60d6ba.png"style="width: 16px; height: 16px; min-width: 16px; margin-right: 6px;"><div style="font-size: 12px; line-height: 16px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">https://lailin.xyz/post/notion-markdown-blog.html</div></div></div><div style="flex: 1 1 180px; display: block; position: relative;"><div style="position: absolute; inset: 0px;"><div style="width: 100%; height: 100%;"><img src="https://i.cuger.cn/b/4822d5f97a1c93d47bf2921789a3a730.png"referrerpolicy="same-origin"style="display: block; object-fit: cover; border-radius: 3px; width: 100%; height: 100%;"></div></div></div></a></div></div>
+
+<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;"><div style="display: flex; background:white;border-radius:5px"><a href="https://sanonz.github.io/2020/deploy-a-hexo-blog-from-github-actions/#Workflow-模版"target="_blank"rel="noopener noreferrer"style="display: flex; color: inherit; text-decoration: none; user-select: none; transition: background 20ms ease-in 0s; cursor: pointer; flex-grow: 1; min-width: 0px; flex-wrap: wrap-reverse; align-items: stretch; text-align: left; overflow: hidden; border: 1px solid rgba(55, 53, 47, 0.16); border-radius: 5px; position: relative; fill: inherit;"><div style="flex: 4 1 180px; padding: 12px 14px 14px; overflow: hidden; text-align: left;"><div style="font-size: 14px; line-height: 20px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 24px; margin-bottom: 2px;">利用 Github Actions 自动部署 Hexo 博客 | Sanonz</div><div style="font-size: 12px; line-height: 16px; color: rgba(55, 53, 47, 0.65); height: 32px; overflow: hidden;">介绍Github Actions 可以很方便实现 CI/CD 工作流，类似 Travis 的用法，来帮我们完成一些工作，比如实现自动化测试、打包、部署等操作。当我们运行 Jobs 时，它会创建一个容器 (runner)，容器支持：Ubuntu、Windows 和 MacOS 等系统，在容器中我们可以安装软件，利用安装的软件帮我们处理一些数据，然后把处理好的数据推送到某个地方。本文将介绍利用 Github Actions 实现自动部署 hexo 到 Github Pages，在之前我们需要写完文章</div><div style="display: flex; margin-top: 6px;"><img src="https://sanonz.github.io/images/favicon.ico"style="width: 16px; height: 16px; min-width: 16px; margin-right: 6px;"><div style="font-size: 12px; line-height: 16px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">https://sanonz.github.io/2020/deploy-a-hexo-blog-from-github-actions/#Workflow-模版</div></div></div></a></div></div>
