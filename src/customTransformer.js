@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-18 22:07:58 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-19 15:37:35 +02:00
+ * @LastEditTime: 2023-04-19 16:10:00 +02:00
  * @FilePath: \src\customTransformer.js
  * @Description: 
  * 
@@ -133,7 +133,7 @@ async function link_preview_github(url) {
             else if (info.state === "open") data.state_icon = STATE_SVG.issue.opened;
             else if (info.state === "closed") data.state_icon = STATE_SVG.issue.closed;
         }
-        if (data.state_icon) data.state_icon = `${data.state_icon}<span style="margin-left:3px;margin-right:3px">•</span>#${info.number}<span style="margin-left:3px;margin-right:3px">•</span>`;
+        if (data.state_icon) data.state_icon = `${data.state_icon} #${info.number}<span style="margin-left:3px;margin-right:3px">•</span>`;
         // type: path[2], state: from info.state
         data.title = info.title + " " + (data.state_icon ? data.state_icon : "") + capitalizeFirstLetter(info.state);  // 图标, 状态
         data.avatar = info.user.avatar_url;
