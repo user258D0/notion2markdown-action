@@ -55,6 +55,14 @@ let config = {
 
 // add current running file dir to PATH
 process.env.PATH = __dirname + ":" + process.env.PATH;
+// add all the exec file under __dirname/vendor* dirs the executable permission expect the source dir
+const { execSync } = require("child_process");
+// try to find all the files under __dirname/vendor* dirs and set the executable permission
+try {
+  execSync(`find ${__dirname}/vendor* -type f -not -name "*.tar.gz" -exec chmod +x {} \\;`);
+} catch (e) {
+  console.log(`Failed to set the executable permission for all the files under ${__dirname}/vendor* dirs, error: ${e}`);
+}
 
 (async function () {
   notion.init(config);
