@@ -260,7 +260,7 @@ async function video(block) {
                 video_url = `https://v.qq.com/txp/iframe/player.html?vid=${vid}`;
                 break;
             default:
-                console.error("Video block with unsupported domain: ", block);
+                console.error("Video block with unsupported domain: ", domain);
                 video_url = url;
         }
     }
@@ -310,7 +310,7 @@ async function embed(block) {
                 iframe = `<iframe src="${url}" style="width: 100%; margin:0; aspect-ratio: 16/9;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`;
                 break;
             default:
-                console.warn("Embed block with unsupported domain: ", block);
+                console.warn("Embed block with unsupported domain, url: ", url);
                 iframe = `<iframe src="${url}" style="width: 100%; margin:0; aspect-ratio: 16/9;" allowfullscreen="" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>`
         }
     } catch (err) {
