@@ -54,6 +54,8 @@ function init(conf) {
   let picgo_config = {
     "picBed": config.picBed,
     "picgo-plugin-pic-migrater": {
+      // only include notion image
+      include: `^(https://.*?/secure\.notion-static\.com\/.+\.(?:jpg|jpeg|png|gif|webp)\?.+)`, 
       exclude: `^(?=.*${domain.replace('.', '\.')}).*|.*\.ico$`, // exclude the domain and icon
     },
     "pic-base-url": config.pic_base_url || null
