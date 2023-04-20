@@ -1,6 +1,6 @@
 {
   "name": "notion2markdown-action",
-  "version": "0.5.3",
+  "version": "0.5.4",
   "description": "",
   "main": "index.js",
   "scripts": {
@@ -26,8 +26,6 @@
     "imagemin-mozjpeg": "^9.0.0",
     "imagemin-pngquant": "^9.0.2",
     "imagemin-svgo": "^9.0.0",
-    "imagemin-upng": "^4.0.0",
-    "imagemin-webpack-plugin": "^2.4.2",
     "install": "^0.13.0",
     "md5-file": "^5.0.0",
     "moment-timezone": "^0.5.43",
