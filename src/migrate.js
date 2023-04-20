@@ -88,7 +88,7 @@ class NotionMigrater extends Migrater.default {
   async migrate() {
     const originTransformer = this.ctx.getConfig('picBed.transformer') || null;
     this.ctx.setConfig({
-      'picBed.transformer': 'path'
+      'picBed.transformer': 'base64'
     });
     this.ctx.output = []; // a bug before picgo v1.2.2
     const include = this.ctx.getConfig('picgo-plugin-pic-migrater.include') || null;
@@ -188,19 +188,10 @@ class NotionMigrater extends Migrater.default {
         total: totalImageNeedToProcess
       };
     }
-    /**
-     * save the image to local before upload
-     */
-    const tmp_dir = fs.mkdtempSync(path.join(os.tmpdir(), 'picgo-upload-cache'));
-    var tmp_images = [];
-    toUploadImgs.forEach((item) => {
-      fs.writeFileSync(path.join(tmp_dir, item.fileName), item.buffer);
-      tmp_images.push(path.join(tmp_dir, item.fileName));
-    });
     // upload
     let output = [];
     try {
-      const res = await this.ctx.upload(tmp_images);
+      const res = await this.ctx.upload(toUploadImgs);
       if (Array.isArray(res)) {
         output = res;
       }
@@ -210,8 +201,6 @@ class NotionMigrater extends Migrater.default {
       this.ctx.log.error(e);
       output = this.ctx.output;
     }
-    // remove the tmp dir
-    fs.rmdirSync(tmp_dir, { recursive: true });
     return {
       urls: existsImgsList.concat(output.filter(item => item.imgUrl && item.imgUrl !== item.origin).map(item => {
         return {
