@@ -11,6 +11,49 @@ const imageminGifsicle = require("imagemin-gifsicle");
 const imageminSvgo = require("imagemin-svgo");
 
 
+async function checkPicExist(picUrl) {
+  try {
+    const res = await axios.head(picUrl);
+    return res.status === 200;
+  } catch (e) {
+    return false;
+  }
+}
+
+async function compressPic(picBuffer, extname) {
+  return imagemin.buffer(picBuffer, {
+    plugins: [
+      imageminPngquant(),
+      imageminMozjpeg(),
+      imageminGifsicle(),
+      imageminSvgo()
+    ],
+  }).then((newBuffer) => {
+    const { width, height } = imageSize(newBuffer);
+    var item = {
+      buffer: newBuffer,
+      width: width,
+      height: height,
+      fileName: `${crypto.createHash("md5").update(newBuffer).digest("hex")}${extname}`,
+    }
+    // update the buffer
+    console.log(`Compress image ${item.fileName} success`);
+    return item;
+  });
+}
+
+async function checkPicUrlList(picUrlList) {
+  return Promise.all(picUrlList.map(async (url) => {
+    const exists = await checkPicExist(url);
+    if (exists) {
+      return true;
+    }
+    else {
+      return false;
+    }
+  }));
+}
+
 class NotionMigrater extends Migrater.default {
   async getPicFromURL(url) {
     return this.ctx.request({
@@ -49,7 +92,7 @@ class NotionMigrater extends Migrater.default {
     const base_url = this.ctx.getConfig('pic-base-url') || null;
     const includesReg = new RegExp(include);
     const excludesReg = new RegExp(exclude);
-    const result = {
+    var result = {
       urls: [],
       success: 0,
       exists: 0,
@@ -58,10 +101,10 @@ class NotionMigrater extends Migrater.default {
     if (!this.urlArray || this.urlArray.length === 0) {
       return result;
     }
+    var existsImgsList = [];
     // filter the url using include and exclude
     const toUploadURLs = this.urlArray.filter(url => ((!include || includesReg.test(url)) && (!exclude || !excludesReg.test(url)))).map(async (url) => {
       return await new Promise(async (resolve, reject) => {
-        result.total += 1;
         try {
           let imgInfo;
           const picPath = this.getLocalPath(url);
@@ -81,28 +124,8 @@ class NotionMigrater extends Migrater.default {
       });
     });
     var toUploadImgs = await Promise.all(toUploadURLs).then(imgs => imgs.filter(img => img !== undefined));
-    // compress the image if the config is set
-    if (this.ctx.getConfig('compress')) {
-      toUploadImgs = await Promise.all(toUploadImgs.map(async (item) => {
-        return await imagemin.buffer(item.buffer, {
-          plugins: [
-            imageminPngquant(),
-            imageminMozjpeg(),
-            imageminGifsicle(),
-            imageminSvgo()
-          ],
-        }).then((buffer) => {
-          item.buffer = buffer;
-          // update image width and height based on the new buffer
-          const { width, height } = imageSize(buffer);
-          item.width = width;
-          item.height = height;
-          item.fileName = `${crypto.createHash("md5").update(buffer).digest("hex")}${item.extname}`;
-          // update the buffer
-          return item;
-        });
-      }));
-    }
+    const totalImageNeedToProcess = toUploadImgs.length;
+    console.log(`Total ${totalImageNeedToProcess} images to upload, list: ${toUploadImgs.map(item => item.fileName).join(', ')}`);
     // 文件重命名为 md5 hash
     toUploadImgs.forEach((item) => {
       item.fileName =
@@ -113,34 +136,51 @@ class NotionMigrater extends Migrater.default {
      */
     if (base_url) {
       // check if the file exists on the server
-      const existsImgs = await Promise.all(toUploadImgs.map(async (item) => {
-        const url = `${base_url}${item.fileName}`;
-        try {
-          const res = await axios.head(url);
-          if (res && res.status === 200) {
-            console.log(`Image ${url} exists`);
-            return {
-              original: item.origin,
-              new: url
-            };
-          }
-        } catch (e) {
-          if (axios.isAxiosError(e) && e.response && e.response.status === 404) {
-            console.log(`Image ${url} not exists on pic bed.`);
-            return null;
-          }
-          console.warn(`Some error happened when checking image ${url}, ${e}`);
-        }
-        console.log(`Image ${url} not exists`);
-        return null;
+      const imageUrlExistCheckList = await checkPicUrlList(toUploadImgs.map(item => `${base_url}${item.fileName}`));
+      // get the existsImgsList with the url
+      existsImgsList = existsImgsList.concat(toUploadImgs.filter((item, index) => {
+        return imageUrlExistCheckList[index];
+      }).map(item => {
+        return {
+          original: item.origin,
+          new: `${base_url}${item.fileName}`
+        };
       }));
-      result.urls = result.urls.concat(existsImgs.filter(item => item !== null));
-      result.exists = result.urls.length;
-      // remove the result.urls from toUploadImgs
+      // remove the existsImgsList from toUploadImgs
       toUploadImgs = toUploadImgs.filter((item, index) => {
-        return !existsImgs[index];
+        return !imageUrlExistCheckList[index];
       });
     }
+    // compress the image if the config is set
+    if (this.ctx.getConfig('compress')) {
+      toUploadImgs = await Promise.all(toUploadImgs.map(async (item) => {
+        var item_compressed = await compressPic(item.buffer, item.extname);
+        item_compressed.origin = item.origin;
+        return item_compressed;
+      }));
+    }
+    // filter the image again if the base_url is set
+    if (base_url) {
+      // check if the file exists on the server
+      const imageUrlExistCheckList = await checkPicUrlList(toUploadImgs.map(item => `${base_url}${item.fileName}`));
+      // get the existsImgsList with the url
+      existsImgsList = existsImgsList.concat(toUploadImgs.filter((item, index) => {
+        return imageUrlExistCheckList[index];
+      }).map(item => {
+        return {
+          original: item.origin,
+          new: `${base_url}${item.fileName}`
+        };
+      }));
+      // remove the existsImgsList from toUploadImgs
+      toUploadImgs = toUploadImgs.filter((item, index) => {
+        return !imageUrlExistCheckList[index];
+      });
+    }
+    // 整合输出
+    console.log('===============================')
+    console.log(`Total ${totalImageNeedToProcess} images to process, ${existsImgsList.length} images already exists, ${toUploadImgs.length} images to upload`)
+    console.log('===============================')
     // upload
     let output = [];
     if (toUploadImgs && toUploadImgs.length > 0) {
@@ -162,17 +202,20 @@ class NotionMigrater extends Migrater.default {
       }
     }
     // merge the result
-    result.urls = result.urls.concat(output.filter(item => item.imgUrl && item.imgUrl !== item.origin).map(item => {
-      return {
-        original: item.origin,
-        new: item.imgUrl
-      };
-    }));
-    result.success = result.urls.length;
     this.ctx.setConfig({
       'picBed.transformer': originTransformer // for GUI reset config
     });
-    return result;
+    return {
+      urls: existsImgsList.concat(output.filter(item => item.imgUrl && item.imgUrl !== item.origin).map(item => {
+        return {
+          original: item.origin,
+          new: item.imgUrl
+        };
+      })),
+      success: output.filter(item => item.imgUrl && item.imgUrl !== item.origin).length + existsImgsList.length,
+      exists: existsImgsList.length,
+      total: totalImageNeedToProcess
+    };
   }
 }
 

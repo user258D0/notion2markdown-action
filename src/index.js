@@ -53,6 +53,9 @@ let config = {
   timezone: core.getInput("timezone") || "Asia/Shanghai",
 };
 
+// add current running file dir to PATH
+process.env.PATH = __dirname + ":" + process.env.PATH;
+
 (async function () {
   notion.init(config);
   await notion.sync();
