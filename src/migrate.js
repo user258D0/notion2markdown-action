@@ -3,6 +3,10 @@ const FileHandler = require("picgo-plugin-pic-migrater/dist/lib/FileHandler.js")
 const crypto = require("crypto");
 const axios = require("axios");
 
+const fs = require("fs");
+const path = require("path");
+const os = require("os");
+
 const imagemin = require("imagemin");
 const imageSize = require("image-size");
 const imageminPngquant = require("imagemin-pngquant");
@@ -84,7 +88,7 @@ class NotionMigrater extends Migrater.default {
   async migrate() {
     const originTransformer = this.ctx.getConfig('picBed.transformer') || null;
     this.ctx.setConfig({
-      'picBed.transformer': 'base64'
+      'picBed.transformer': 'path'
     });
     this.ctx.output = []; // a bug before picgo v1.2.2
     const include = this.ctx.getConfig('picgo-plugin-pic-migrater.include') || null;
@@ -92,12 +96,6 @@ class NotionMigrater extends Migrater.default {
     const base_url = this.ctx.getConfig('pic-base-url') || null;
     const includesReg = new RegExp(include);
     const excludesReg = new RegExp(exclude);
-    var result = {
-      urls: [],
-      success: 0,
-      exists: 0,
-      total: 0
-    };
     if (!this.urlArray || this.urlArray.length === 0) {
       return result;
     }
@@ -181,30 +179,39 @@ class NotionMigrater extends Migrater.default {
     console.log('===============================')
     console.log(`Total ${totalImageNeedToProcess} images to process, ${existsImgsList.length} images already exists, ${toUploadImgs.length} images to upload`)
     console.log('===============================')
+    if (!toUploadImgs || toUploadImgs.length === 0) {
+      console.log('No image needs to upload, exit');
+      return {
+        urls: existsImgsList,
+        success: existsImgsList.length,
+        exists: existsImgsList.length,
+        total: totalImageNeedToProcess
+      };
+    }
+    /**
+     * save the image to local before upload
+     */
+    const tmp_dir = fs.mkdtempSync(path.join(os.tmpdir(), 'picgo-upload-cache'));
+    var tmp_images = [];
+    toUploadImgs.forEach((item) => {
+      fs.writeFileSync(path.join(tmp_dir, item.fileName), item.buffer);
+      tmp_images.push(path.join(tmp_dir, item.fileName));
+    });
     // upload
     let output = [];
-    if (toUploadImgs && toUploadImgs.length > 0) {
-      if (this.guiApi) {
-        output = await this.guiApi.upload(toUploadImgs);
-      }
-      else {
-        try {
-          const res = await this.ctx.upload(toUploadImgs);
-          if (Array.isArray(res)) {
-            output = res;
-          }
-        }
-        catch (e) {
-          // fake output
-          this.ctx.log.error(e);
-          output = this.ctx.output;
-        }
+    try {
+      const res = await this.ctx.upload(tmp_images);
+      if (Array.isArray(res)) {
+        output = res;
       }
     }
-    // merge the result
-    this.ctx.setConfig({
-      'picBed.transformer': originTransformer // for GUI reset config
-    });
+    catch (e) {
+      // fake output
+      this.ctx.log.error(e);
+      output = this.ctx.output;
+    }
+    // remove the tmp dir
+    fs.rmdirSync(tmp_dir, { recursive: true });
     return {
       urls: existsImgsList.concat(output.filter(item => item.imgUrl && item.imgUrl !== item.origin).map(item => {
         return {
