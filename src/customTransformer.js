@@ -183,7 +183,7 @@ async function bookmark(block) {
     const { bookmark, author } = block;
     if (!bookmark?.url) return "";
     const caption = bookmark.caption && bookmark.caption.length ? bookmark.caption[0].plain_text : "";
-    return await axios.get(bookmark.url).then((res) => {
+    const p = await axios.get(bookmark.url).then((res) => {
         const $ = cheerio.load(res.data, {
             ignoreWhitespace: true,
             lowerCaseAttributeNames: true,
@@ -209,16 +209,27 @@ async function bookmark(block) {
             favicon: favicon,
             url: bookmark.url,
         }
-    }).then((p) => {
-        var cover_div = p.cover ? `<div style="flex: 1 1 180px; display: block; position: relative;"><div style="position: absolute; inset: 0px;"><div style="width: 100%; height: 100%;"><img src="${p.cover}"referrerpolicy="same-origin"style="display: block; object-fit: cover; border-radius: 3px; width: 100%; height: 100%;"></div></div></div>` : "";
-        var body_div = `<div style="display: flex; background:white;border-radius:5px"><a href="${p.url}"target="_blank"rel="noopener noreferrer"style="display: flex; color: inherit; text-decoration: none; user-select: none; transition: background 20ms ease-in 0s; cursor: pointer; flex-grow: 1; min-width: 0px; flex-wrap: wrap-reverse; align-items: stretch; text-align: left; overflow: hidden; border: 1px solid rgba(55, 53, 47, 0.16); border-radius: 5px; position: relative; fill: inherit;"><div style="flex: 4 1 180px; padding: 12px 14px 14px; overflow: hidden; text-align: left;"><div style="font-size: 14px; line-height: 20px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 24px; margin-bottom: 2px;">${p.title}</div><div style="font-size: 12px; line-height: 16px; color: rgba(55, 53, 47, 0.65); height: 32px; overflow: hidden;">${p.description}</div><div style="display: flex; margin-top: 6px;"><img src="${p.favicon}"style="width: 16px; height: 16px; min-width: 16px; margin-right: 6px;"><div style="font-size: 12px; line-height: 16px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.url}</div></div></div>${cover_div}</a></div>`
-        var caption_div = caption ? CAPTION_DIV_TEMPLATE.replace("{{caption}}", caption) : "";
-        return `<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;">${body_div}${caption_div}</div>`;
     })
         .catch((err) => {
-            console.error('Bookmark preview fetch error: ', err);
-            return false
+            if (axios.isAxiosError(err)) {
+                console.warn('Bookmark preview fetch error: ', err.response?.status, err.response?.statusText);
+
+            } else {
+                console.warn('Bookmark preview fetch error: ', err);
+            }
+            return {
+                // title is the domain name
+                title: new URL(bookmark.url).hostname,
+                description: "",
+                cover: "",
+                favicon: "",
+                url: bookmark.url,
+            }
         });
+    var cover_div = p.cover ? `<div style="flex: 1 1 180px; display: block; position: relative;"><div style="position: absolute; inset: 0px;"><div style="width: 100%; height: 100%;"><img src="${p.cover}"referrerpolicy="same-origin"style="display: block; object-fit: cover; border-radius: 3px; width: 100%; height: 100%;"></div></div></div>` : "";
+    var body_div = `<div style="display: flex; background:white;border-radius:5px"><a href="${p.url}"target="_blank"rel="noopener noreferrer"style="display: flex; color: inherit; text-decoration: none; user-select: none; transition: background 20ms ease-in 0s; cursor: pointer; flex-grow: 1; min-width: 0px; flex-wrap: wrap-reverse; align-items: stretch; text-align: left; overflow: hidden; border: 1px solid rgba(55, 53, 47, 0.16); border-radius: 5px; position: relative; fill: inherit;"><div style="flex: 4 1 180px; padding: 12px 14px 14px; overflow: hidden; text-align: left;"><div style="font-size: 14px; line-height: 20px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis; min-height: 24px; margin-bottom: 2px;">${p.title}</div><div style="font-size: 12px; line-height: 16px; color: rgba(55, 53, 47, 0.65); height: 32px; overflow: hidden;">${p.description}</div><div style="display: flex; margin-top: 6px;"><img src="${p.favicon}"style="width: 16px; height: 16px; min-width: 16px; margin-right: 6px;"><div style="font-size: 12px; line-height: 16px; color: rgb(55, 53, 47); white-space: nowrap; overflow: hidden; text-overflow: ellipsis;">${p.url}</div></div></div>${cover_div}</a></div>`
+    var caption_div = caption ? CAPTION_DIV_TEMPLATE.replace("{{caption}}", caption) : "";
+    return `<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;">${body_div}${caption_div}</div>`;
 }
 
 async function video(block) {
