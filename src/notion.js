@@ -82,6 +82,7 @@ async function sync() {
    * 需要处理的逻辑:
    * 1. 对于已发布的文章，如果本地文件存在，且存在abbrlink，则更新notion中的abbrlink
    * 2. 对于未发布的文章, 如果本地文件存在，则尝试读取本地文件的abbrlink，如果存在，则更新notion中的abbrlink, 并生成markdown文件
+   * 3. 对于本地存在的文章，如果notion中不是已发布状态，则删除本地文件
    */
   // get all the output markdown filename list of the pages, and remove the file not exists in the pages under the output directory
   // query the filename list from the output directory
@@ -114,11 +115,12 @@ async function sync() {
     mkdirSync(config.output_dir.page, { recursive: true });
   }
   /**
-   * 1. 删除notion中不存在的文章
+   * 1. 删除本地存在，但是Notion中不是已发布状态的文章
    * 2. 更新notion中已发布的文章的abbrlink
    *  */
   // load page properties from the markdown file
   const localPostFileList = readdirSync(config.output_dir.post);
+  var deletedPostList = [];
   for (let i = 0; i < localPostFileList.length; i++) {
     const file = localPostFileList[i];
     if (!file.endsWith(".md")) {
@@ -133,6 +135,7 @@ async function sync() {
     if (!page && config.output_dir.clean_unpublished_post) {
       console.log(`Page is not exists, delete the local file: ${file}`);
       unlinkSync(join(config.output_dir.post, file));
+      deletedPostList.push(file);
       continue;
     }
     // if the page is exists, update the abbrlink of the page if it is empty and the local file has the abbrlink
@@ -203,7 +206,7 @@ async function sync() {
     console.log(`Page conversion successfully: ${prop.id}, ${prop.title}`);
     return true;
   }));
-  console.log(`All pages are handled, ${notionPagePropList.length} pages are handled, ${results.filter((r) => r).length} pages are updated.`);
+  console.log(`All pages are handled, ${notionPagePropList.length} pages are handled, ${results.filter((r) => r).length} pages are published, ${deletedPostList.length} pages are deleted.`);
 }
 
 /**
