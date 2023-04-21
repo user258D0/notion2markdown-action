@@ -241,7 +241,7 @@ async function audio(block) {
     const url = getUrlFromFileOrExternalBlock(audio, 'audio');
     if (!url) return false;
     const caption = audio.caption && audio.caption.length ? audio.caption[0].plain_text : "";
-    var audio_div = `<audio controls style="width: 100%; margin:0;"><source src="${url}" type="audio/mpeg"></audio>`;
+    var audio_div = `<audio controls style="width: 100%; height: 54px;margin:0;"><source src="${url}" type="audio/mpeg"></audio>`;
     var caption_div = caption ? CAPTION_DIV_TEMPLATE.replace("{{caption}}", caption) : "";
     return `<div style="width: 100%; margin: 0 0 2px;">${audio_div}${caption_div}</div>`
 }

@@ -97,7 +97,12 @@ class NotionMigrater extends Migrater.default {
     const includesReg = new RegExp(include);
     const excludesReg = new RegExp(exclude);
     if (!this.urlArray || this.urlArray.length === 0) {
-      return result;
+      return {
+        urls: [],
+        success: 0,
+        exists: 0,
+        total: 0,
+      };
     }
     var existsImgsList = [];
     // filter the url using include and exclude
