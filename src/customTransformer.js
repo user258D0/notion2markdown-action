@@ -247,9 +247,12 @@ async function video(block) {
     var video_url = "";
     try {
         switch (domain) {
+            case "youtu.be":
+                vid = new URL(url).pathname.split("/")[1] || false;
+            case "m.youtube.com":
             case "www.youtube.com":
-                vid = new URL(url).searchParams.get("v") || false;
-                video_url = `https://www.youtube.com/embed/${vid}`;
+                if (!vid) vid = new URL(url).searchParams.get("v") || false;
+                if (vid) video_url = `https://www.youtube.com/embed/${vid}`;
                 break;
             case "www.bilibili.com":
                 vid = new URL(url).pathname.split("/")[2] || false;
