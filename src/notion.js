@@ -19,7 +19,7 @@ const { extname, join } = require("path");
 const Migrater = require("./migrate");
 const { format } = require("prettier");
 const moment = require('moment-timezone');
-const { t_link_preview, t_bookmark, t_embed, t_pdf, t_video } = require('./customTransformer');
+const t = require('./customTransformer');
 
 let config = {
   notion_secret: "",
@@ -68,11 +68,12 @@ function init(conf) {
   // passing notion client to the option
   n2m = new NotionToMarkdown({ notionClient: notion });
   n2m.setCustomTransformer("callout", callout(n2m));
-  n2m.setCustomTransformer("bookmark", t_bookmark);
-  n2m.setCustomTransformer("video", t_video);
-  n2m.setCustomTransformer("embed", t_embed);
-  n2m.setCustomTransformer("link_preview", t_link_preview);
-  n2m.setCustomTransformer("pdf", t_pdf);
+  n2m.setCustomTransformer("bookmark", t.bookmark);
+  n2m.setCustomTransformer("video", t.video);
+  n2m.setCustomTransformer("embed", t.embed);
+  n2m.setCustomTransformer("link_preview", t.link_preview);
+  n2m.setCustomTransformer("pdf", t.pdf);
+  n2m.setCustomTransformer("audio", t.audio);
 }
 
 async function sync() {

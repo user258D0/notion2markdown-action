@@ -12,8 +12,26 @@
 const axios = require('axios');
 const cheerio = require('cheerio');
 
+
 function capitalizeFirstLetter(str) {
     return str.charAt(0).toUpperCase() + str.slice(1);
+}
+
+function getUrlFromFileOrExternalBlock(block, embed_type = "audio") {
+    type = capitalizeFirstLetter(embed_type.toLowerCase());
+    if (!block) {
+        console.error(`${type} block is null: `, block);
+        return false;
+    }
+    if (block.type === "file" && block.file?.url) {
+        console.warn(`${type} block with file type: ${block.type}, it's a temporary link which will expire soon.`);
+        return block.file?.url;
+    } else if (block.type === "external" && block.external.url) {
+        return block.external?.url;
+    } else {
+        console.error(`${type} block with unsupported type: `, block.type);
+        return false;
+    }
 }
 
 var CAPTION_DIV_TEMPLATE = `<div style="text-align: center; margin:0;"><p>{{caption}}</p></div>`;
@@ -34,7 +52,7 @@ async function link_preview(block) {
     try {
         switch (new URL(url).hostname) {
             case "github.com":
-                return await link_preview_github(url);
+                return await _link_preview_github(url);
             default:
                 console.error("Link preview block with unsupported domain: ", block);
                 return false;
@@ -57,7 +75,7 @@ async function link_preview(block) {
  * @returns 
  */
 
-async function link_preview_github(url) {
+async function _link_preview_github(url) {
     /**
      * url example: 
      * https://github.com/Doradx, home page
@@ -147,38 +165,6 @@ async function link_preview_github(url) {
     return HTML_TEMPLATE.replace(/\{\{(.*?)\}\}/g, (match, key) => data[key]);
 }
 
-/**
- * to parse a pdf block
- * @param {*} block 
- * @returns 
- */
-
-async function pdf(block) {
-    const { pdf } = block || {};
-    if (!pdf) {
-        return false;
-    }
-    var caption = pdf.caption && pdf.caption.length > 0 ? pdf.caption[0].plain_text : "";
-    var iframe = false;
-    switch (pdf.type) {
-        case "file":
-            console.warn("PDF files are stored on Notion servers and may expire after a period of time, URL:", pdf.file.url);
-            iframe = `<iframe src="${pdf.file.url}" style="width: 100%; margin:0; aspect-ratio: 16/9;"></iframe>`;
-            break;
-        case "external":
-            iframe = `<iframe src="${pdf.external.url}" style="width: 100%; margin:0; aspect-ratio: 16/9;"></iframe>`;
-            break;
-        default:
-            console.error("PDF block with unsupported type: ", block);
-            return false;
-    }
-    if (!iframe) {
-        return false;
-    }
-    const caption_div = caption ? CAPTION_DIV_TEMPLATE.replace("{{caption}}", caption) : "";
-    return `<div class="pdf">${iframe}${caption_div}</div>`;
-}
-
 async function bookmark(block) {
     const { bookmark, author } = block;
     if (!bookmark?.url) return "";
@@ -232,15 +218,39 @@ async function bookmark(block) {
     return `<div style="width: 100%; margin-top: 4px; margin-bottom: 4px;">${body_div}${caption_div}</div>`;
 }
 
+/**
+ * to parse a pdf block
+ * @param {*} block 
+ * @returns 
+ */
+
+async function pdf(block) {
+    const { pdf } = block || {};
+    if (!pdf) return false;
+    const url = getUrlFromFileOrExternalBlock(pdf, 'pdf');
+    if (!url) return false;
+    var caption = pdf.caption && pdf.caption.length > 0 ? pdf.caption[0].plain_text : "";
+    var iframe = `<iframe src="${url}" style="width: 100%; margin:0; aspect-ratio: 16/9;"></iframe>`;
+    const caption_div = caption ? CAPTION_DIV_TEMPLATE.replace("{{caption}}", caption) : "";
+    return `<div class="pdf">${iframe}${caption_div}</div>`;
+}
+
+async function audio(block) {
+    const { audio } = block;
+    if (!audio) return false;
+    const url = getUrlFromFileOrExternalBlock(audio, 'audio');
+    if (!url) return false;
+    const caption = audio.caption && audio.caption.length ? audio.caption[0].plain_text : "";
+    var audio_div = `<audio controls style="width: 100%; margin:0;"><source src="${url}" type="audio/mpeg"></audio>`;
+    var caption_div = caption ? CAPTION_DIV_TEMPLATE.replace("{{caption}}", caption) : "";
+    return `<div style="width: 100%; margin: 0 0 2px;">${audio_div}${caption_div}</div>`
+}
+
 async function video(block) {
     const { video } = block;
-    if (!video) return false;
-    if (!video?.external?.url) {
-        console.error("Video block without external url: ", block);
-        return false;
-    }
-    const caption = video.caption && video.caption.length ? video.caption[0].plain_text : "";
-    const url = video.external.url;
+    const url = getUrlFromFileOrExternalBlock(video, 'video');
+    if (!url) return false;
+    var caption = video.caption && video.caption.length > 0 ? video.caption[0].plain_text : "";
     // fetch the iframe url
     const domain = new URL(url).hostname;
     var vid = false;
@@ -329,9 +339,10 @@ async function embed(block) {
 }
 
 module.exports = {
-    t_bookmark: bookmark,
-    t_video: video,
-    t_embed: embed,
-    t_link_preview: link_preview,
-    t_pdf: pdf,
+    bookmark,
+    link_preview,
+    video,
+    audio,
+    embed,
+    pdf
 }
