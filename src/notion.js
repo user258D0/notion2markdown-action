@@ -15,7 +15,7 @@ const { parse } = require("twemoji");
 const { getBlockChildren } = require("notion-to-md/build/utils/notion");
 const YAML = require("yaml");
 const { PicGo } = require("picgo");
-const { extname, join } = require("path");
+const path = require("path");
 const Migrater = require("./migrate");
 const { format } = require("prettier");
 const moment = require('moment-timezone');
@@ -95,16 +95,19 @@ async function sync() {
           console.error(`Page ${properties.title} has no filename, the page id will be used as the filename.`);
           properties.filename = properties.id;
         }
-        properties.filePath = join(config.output_dir.page, properties.filename, 'index.md');
-        properties.output_dir = join(config.output_dir.page, properties.filename);
+        properties.filePath = path.join(config.output_dir.page, properties.filename, 'index.md');
         properties.filename = "index.md";
         break;
       case "post":
       default:
         properties.filename = properties.filename != undefined && properties.filename ? properties.filename + ".md" : properties.title + ".md";
-        properties.filePath = join(config.output_dir.post, properties.filename);
-        properties.output_dir = config.output_dir.post;
+        // get the filename and directory of the post, if the filename includes /, then it will be treated as a subdirectory
+        properties.filePath = path.join(config.output_dir.post, properties.filename);
+        if (properties.filename.includes("/")) {
+          properties.filename = properties.filename.split("/").pop();
+        }
     }
+    properties.output_dir = path.dirname(properties.filePath);
     return properties;
   }));
   console.log(`${notionPagePropList.length} pages found in notion.`);
@@ -127,7 +130,7 @@ async function sync() {
     if (!file.endsWith(".md")) {
       continue;
     }
-    var localProp = loadPropertiesAndContentFromMarkdownFile(join(config.output_dir.post, file));
+    var localProp = loadPropertiesAndContentFromMarkdownFile(path.join(config.output_dir.post, file));
     if (!localProp) {
       continue;
     }
@@ -135,7 +138,7 @@ async function sync() {
     // if the page is not exists, delete the local file
     if (!page && config.output_dir.clean_unpublished_post) {
       console.log(`Page is not exists, delete the local file: ${file}`);
-      unlinkSync(join(config.output_dir.post, file));
+      unlinkSync(path.join(config.output_dir.post, file));
       deletedPostList.push(file);
       continue;
     }
