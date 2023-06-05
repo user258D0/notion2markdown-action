@@ -103,125 +103,94 @@ class NotionMigrater extends Migrater.default {
       };
     }
     var existsImgsList = [];
+    var successImgsList = [];
     // filter the url using include and exclude
-    const toUploadURLs = this.urlArray.filter(url => ((!include || includesReg.test(url)) && (!exclude || !excludesReg.test(url)))).map(async (url) => {
-      return await new Promise(async (resolve, reject) => {
-        try {
-          let imgInfo;
-          const picPath = this.getLocalPath(url);
-          if (!picPath) {
-            imgInfo = await this.handlePicFromURL(url);
-          }
-          else {
-            imgInfo = await this.handlePicFromLocal(picPath, url);
-          }
+    const toUploadURLs = this.urlArray.filter(url => ((!include || includesReg.test(url)) && (!exclude || !excludesReg.test(url))));
+    console.log(`Total ${toUploadURLs.length} images to upload.`);
+    /** 
+     * 采用队列进行图片上传，防止图片过多的时候，资源占用过多
+    */
+    // the queue
+    const queue = new (await import('p-queue')).default({ concurrency: 20 })
+    // the queue task function
+    const queueTask = async (url) => {
+      let imgInfo;
+      try {
+        const picPath = this.getLocalPath(url);
+        if (!picPath) {
           // get pic uuid from the url using regex
           const uuidreg = /[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}/;
-          const id = uuidreg.exec(url);
+          const id = uuidreg.exec(url)?.[0];
+          var extname = url.split('?')[0].split('.').pop()?.toLowerCase();
           // if the url is a notion url
-          if (id) {
-            imgInfo.uuid = id[0];
+          if (id && extname) {
             // 文件重命名为notion url中的id
-            imgInfo.fileName = `${imgInfo.uuid}${imgInfo.extname}`;
+            extname = '.' + extname;
+            if (base_url && await checkPicExist(`${base_url}${id}${extname}`)) {
+              existsImgsList.push({
+                original: url,
+                new: `${base_url}${id}${extname}`
+              });
+              console.log(`Image ${id}${extname} already exists, skip`);
+              return;
+            }
+            imgInfo = await this.handlePicFromURL(url);
+            imgInfo.uuid = id;
+            imgInfo.extname = extname;
+            imgInfo.fileName = `${id}${extname}`;
+          } else {
+            imgInfo = await this.handlePicFromURL(url);
           }
-          resolve(imgInfo);
         }
-        catch (err) {
-          // dont reject
-          resolve(undefined);
-          this.ctx.log.error(err);
+        else {
+          imgInfo = await this.handlePicFromLocal(picPath, url);
         }
-      });
-    });
-    var toUploadImgs = await Promise.all(toUploadURLs).then(imgs => imgs.filter(img => img !== undefined));
-    const totalImageNeedToProcess = toUploadImgs.length;
-    console.log(`Total ${totalImageNeedToProcess} images to upload, list: ${toUploadImgs.map(item => item.fileName).join(', ')}`);
-    // 文件重命名为 md5 hash
-    // toUploadImgs.forEach((item) => {
-    //   item.fileName =
-    //     crypto.createHash("md5").update(item.buffer).digest("hex") + item.extname;
-    // });
-    /**
-     * check the url if it is already uploaded, if base_url is set
-     */
-    if (base_url) {
-      // check if the file exists on the server
-      const imageUrlExistCheckList = await checkPicUrlList(toUploadImgs.map(item => `${base_url}${item.fileName}`));
-      // get the existsImgsList with the url
-      existsImgsList = await existsImgsList.concat(toUploadImgs.filter((item, index) => {
-        return imageUrlExistCheckList[index];
-      }).map(item => {
-        return {
-          original: item.origin,
-          new: `${base_url}${item.fileName}`
-        };
-      }));
-      // remove the existsImgsList from toUploadImgs
-      toUploadImgs = await toUploadImgs.filter((item, index) => {
-        return !imageUrlExistCheckList[index];
-      });
-    }
-    // compress the image if the config is set
-    if (this.ctx.getConfig('compress')) {
-      toUploadImgs = await Promise.all(toUploadImgs.map(async (item) => {
-        await compressPic(item);
-        return item;
-      }));
-    }
-    // filter the image again if the base_url is set
-    if (base_url) {
-      // check if the file exists on the server
-      const imageUrlExistCheckList = await checkPicUrlList(toUploadImgs.map(item => `${base_url}${item.fileName}`));
-      // get the existsImgsList with the url
-      existsImgsList = existsImgsList.concat(toUploadImgs.filter((item, index) => {
-        return imageUrlExistCheckList[index];
-      }).map(item => {
-        return {
-          original: item.origin,
-          new: `${base_url}${item.fileName}`
-        };
-      }));
-      // remove the existsImgsList from toUploadImgs
-      toUploadImgs = await toUploadImgs.filter((item, index) => {
-        return !imageUrlExistCheckList[index];
-      });
-    }
-    // 整合输出
-    console.log('===============================')
-    console.log(`Total ${totalImageNeedToProcess} images to process, ${existsImgsList.length} images already exists, ${toUploadImgs.length} images to upload`)
-    console.log('===============================')
-    if (!toUploadImgs || toUploadImgs.length === 0) {
-      console.log('No image needs to upload, exit');
-      return {
-        urls: existsImgsList,
-        success: existsImgsList.length,
-        exists: existsImgsList.length,
-        total: totalImageNeedToProcess
-      };
-    }
-    // upload
-    let output = [];
-    try {
-      const res = await this.ctx.upload(toUploadImgs);
-      if (Array.isArray(res)) {
-        output = res;
+        // check the url if it is already uploaded, if base_url is set
+        if (base_url && await checkPicExist(`${base_url}${imgInfo.fileName}`)) {
+          existsImgsList.push({
+            original: url,
+            new: `${base_url}${imgInfo.fileName}`
+          });
+          console.log(`Image ${imgInfo.fileName} already exists, skip`);
+          return;
+        }
+      } catch (e) {
+        this.ctx.log.error(`get pic from url fail: ${e}`);
+        return;
       }
-    }
-    catch (e) {
-      // fake output
-      this.ctx.log.error(e);
-      output = this.ctx.output;
-    }
+
+      // compress the image
+      if (this.ctx.getConfig('compress')) {
+        imgInfo = await compressPic(imgInfo);
+      }
+      // upload the image
+      const result = await this.ctx.upload([imgInfo]);
+      if (result && result[0] && result[0].imgUrl) {
+        successImgsList.push({
+          original: imgInfo.origin,
+          new: result[0].imgUrl
+        });
+        console.log(`Upload image ${imgInfo.fileName} success`);
+      }
+      else {
+        console.log(`Upload image ${imgInfo.fileName} fail`);
+      }
+    };
+    toUploadURLs.forEach(url => {
+      queue.add(() => queueTask(url))
+    })
+    // wait for the queue to be empty
+    await queue.onIdle();
+    // generate the result
+    console.log('===============================')
+    console.log(`Total ${existsImgsList.length} / ${toUploadURLs.length} images already exists`);
+    console.log(`Total ${successImgsList.length} / ${toUploadURLs.length} images upload success, list: ${successImgsList.map(item => item.new).join(', ')}`);
+    console.log('===============================')
     return {
-      urls: existsImgsList.concat(output.filter(item => item.imgUrl && item.imgUrl !== item.origin).map(item => {
-        return {
-          original: item.origin,
-          new: item.imgUrl
-        };
-      })),
-      success: output.filter(item => item.imgUrl && item.imgUrl !== item.origin).length + existsImgsList.length,
+      urls: existsImgsList.concat(successImgsList),
+      success: successImgsList.length + existsImgsList.length,
       exists: existsImgsList.length,
-      total: totalImageNeedToProcess
+      total: toUploadURLs.length
     };
   }
 }
