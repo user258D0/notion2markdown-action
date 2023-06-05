@@ -47,7 +47,12 @@ let n2m = new NotionToMarkdown({ notionClient: notion });
 
 function init(conf) {
   config = conf;
-  notion = new Client({ auth: config.notion_secret });
+  notion = new Client({
+    auth: config.notion_secret,
+    config: {
+      separateChildPage: true, // default: false
+    }
+  });
 
   const domain = new URL(config.pic_base_url).hostname;
 
@@ -222,7 +227,7 @@ async function sync() {
 
 async function page2Markdown(page, filePath, properties) {
   const mdblocks = await n2m.pageToMarkdown(page.id);
-  let md = n2m.toMarkdownString(mdblocks);
+  let md = n2m.toMarkdownString(mdblocks).parent;
   fm = YAML.stringify(properties, { doubleQuotedAsJSON: true });
   // check if the file already exists
   md = format(`---\n${fm}---\n\n${md}`, { parser: "markdown" });
