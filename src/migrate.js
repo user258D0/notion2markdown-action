@@ -120,13 +120,13 @@ class NotionMigrater extends Migrater.default {
       const existsImgs = await checkPicUrlList(toCheckURLs.map(url => {
         const id = uuidreg.exec(url)?.[0];
         var extname = url.split('?')[0].split('.').pop()?.toLowerCase();
-        return `${id}.${extname}`;
+        return `${base_url}${id}.${extname}`;
       }));
       await existsImgs.forEach((exists, index) => {
         if (exists) {
           existsImgsList.push({
             original: toUploadURLs[index],
-            new: `${base_url}${exists}`
+            new: `${exists}`
           });
           console.log(`Image ${exists} already exists, skip`);
         }
@@ -155,7 +155,7 @@ class NotionMigrater extends Migrater.default {
             // 文件重命名为notion url中的id
             imgInfo.extname = '.' + extname;
             imgInfo.uuid = id;
-            imgInfo.fileName = `${id}${extname}`;
+            imgInfo.fileName = `${imgInfo.uuid}${imgInfo.extname}`;
           }
         }
         else {
