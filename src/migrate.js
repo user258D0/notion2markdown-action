@@ -48,7 +48,7 @@ async function checkPicUrlList(picUrlList) {
   return Promise.all(picUrlList.map(async (url) => {
     const exists = await checkPicExist(url);
     if (exists) {
-      return true;
+      return url;
     }
     else {
       return false;
@@ -105,8 +105,35 @@ class NotionMigrater extends Migrater.default {
     var existsImgsList = [];
     var successImgsList = [];
     // filter the url using include and exclude
-    const toUploadURLs = this.urlArray.filter(url => ((!include || includesReg.test(url)) && (!exclude || !excludesReg.test(url))));
+    var toUploadURLs = this.urlArray.filter(url => ((!include || includesReg.test(url)) && (!exclude || !excludesReg.test(url))));
+    var ToProcessURLs = toUploadURLs.length;
     console.log(`Total ${toUploadURLs.length} images to upload.`);
+    // check the url if it is already uploaded, if base_url is set
+    if (base_url) {
+      // filter the url include uuid and extname, to check the existence
+      const uuidreg = /[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}/;
+      const toCheckURLs = toUploadURLs.filter(url => {
+        const id = uuidreg.exec(url)?.[0];
+        var extname = url.split('?')[0].split('.').pop()?.toLowerCase();
+        return id && extname;
+      });
+      const existsImgs = await checkPicUrlList(toCheckURLs.map(url => {
+        const id = uuidreg.exec(url)?.[0];
+        var extname = url.split('?')[0].split('.').pop()?.toLowerCase();
+        return `${base_url}${id}.${extname}`;
+      }));
+      await existsImgs.forEach((exists, index) => {
+        if (exists) {
+          existsImgsList.push({
+            original: toUploadURLs[index],
+            new: `${base_url}${exists}`
+          });
+          console.log(`Image ${exists} already exists, skip`);
+        }
+      });
+      // remove the exists image from the toUploadURLs
+      toUploadURLs = await toUploadURLs.filter(url => !existsImgsList.find(item => item.original === url));
+    }
     /** 
      * 采用队列进行图片上传，防止图片过多的时候，资源占用过多
     */
@@ -118,6 +145,7 @@ class NotionMigrater extends Migrater.default {
       try {
         const picPath = this.getLocalPath(url);
         if (!picPath) {
+          imgInfo = await this.handlePicFromURL(url);
           // get pic uuid from the url using regex
           const uuidreg = /[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}/;
           const id = uuidreg.exec(url)?.[0];
@@ -125,21 +153,9 @@ class NotionMigrater extends Migrater.default {
           // if the url is a notion url
           if (id && extname) {
             // 文件重命名为notion url中的id
-            extname = '.' + extname;
-            if (base_url && await checkPicExist(`${base_url}${id}${extname}`)) {
-              existsImgsList.push({
-                original: url,
-                new: `${base_url}${id}${extname}`
-              });
-              console.log(`Image ${id}${extname} already exists, skip`);
-              return;
-            }
-            imgInfo = await this.handlePicFromURL(url);
+            imgInfo.extname = '.' + extname;
             imgInfo.uuid = id;
-            imgInfo.extname = extname;
             imgInfo.fileName = `${id}${extname}`;
-          } else {
-            imgInfo = await this.handlePicFromURL(url);
           }
         }
         else {
@@ -183,14 +199,14 @@ class NotionMigrater extends Migrater.default {
     await queue.onIdle();
     // generate the result
     console.log('===============================')
-    console.log(`Total ${existsImgsList.length} / ${toUploadURLs.length} images already exists`);
-    console.log(`Total ${successImgsList.length} / ${toUploadURLs.length} images upload success, list: ${successImgsList.map(item => item.new).join(', ')}`);
+    console.log(`Total ${existsImgsList.length} / ${ToProcessURLs} images already exists`);
+    console.log(`Total ${successImgsList.length} / ${ToProcessURLs} images upload success, list: ${successImgsList.map(item => item.new).join(', ')}`);
     console.log('===============================')
     return {
       urls: existsImgsList.concat(successImgsList),
       success: successImgsList.length + existsImgsList.length,
       exists: existsImgsList.length,
-      total: toUploadURLs.length
+      total: ToProcessURLs
     };
   }
 }
