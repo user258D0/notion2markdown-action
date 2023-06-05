@@ -120,7 +120,7 @@ class NotionMigrater extends Migrater.default {
       const existsImgs = await checkPicUrlList(toCheckURLs.map(url => {
         const id = uuidreg.exec(url)?.[0];
         var extname = url.split('?')[0].split('.').pop()?.toLowerCase();
-        return `${base_url}${id}.${extname}`;
+        return `${id}.${extname}`;
       }));
       await existsImgs.forEach((exists, index) => {
         if (exists) {
