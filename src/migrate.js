@@ -37,7 +37,7 @@ async function compressPic(item) {
     item.buffer = newBuffer;
     item.width = width;
     item.height = height;
-    item.fileName = `${crypto.createHash("md5").update(newBuffer).digest("hex")}${item.extname}`;
+    // item.fileName = `${crypto.createHash("md5").update(newBuffer).digest("hex")}${item.extname}`;
     // update the buffer
     console.log(`Compress image ${item.fileName} success`);
     return item;
@@ -137,10 +137,10 @@ class NotionMigrater extends Migrater.default {
     const totalImageNeedToProcess = toUploadImgs.length;
     console.log(`Total ${totalImageNeedToProcess} images to upload, list: ${toUploadImgs.map(item => item.fileName).join(', ')}`);
     // 文件重命名为 md5 hash
-    toUploadImgs.forEach((item) => {
-      item.fileName =
-        crypto.createHash("md5").update(item.buffer).digest("hex") + item.extname;
-    });
+    // toUploadImgs.forEach((item) => {
+    //   item.fileName =
+    //     crypto.createHash("md5").update(item.buffer).digest("hex") + item.extname;
+    // });
     /**
      * check the url if it is already uploaded, if base_url is set
      */
