@@ -161,15 +161,6 @@ class NotionMigrater extends Migrater.default {
         else {
           imgInfo = await this.handlePicFromLocal(picPath, url);
         }
-        // check the url if it is already uploaded, if base_url is set
-        if (base_url && await checkPicExist(`${base_url}${imgInfo.fileName}`)) {
-          existsImgsList.push({
-            original: url,
-            new: `${base_url}${imgInfo.fileName}`
-          });
-          console.log(`Image ${imgInfo.fileName} already exists, skip`);
-          return;
-        }
       } catch (e) {
         this.ctx.log.error(`get pic from url fail: ${e}`);
         return;
