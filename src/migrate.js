@@ -24,8 +24,8 @@ async function checkPicExist(picUrl) {
   }
 }
 
-async function compressPic(picBuffer, extname) {
-  return imagemin.buffer(picBuffer, {
+async function compressPic(item) {
+  return imagemin.buffer(item.buffer, {
     plugins: [
       imageminPngquant(),
       imageminMozjpeg(),
@@ -34,12 +34,10 @@ async function compressPic(picBuffer, extname) {
     ],
   }).then((newBuffer) => {
     const { width, height } = imageSize(newBuffer);
-    var item = {
-      buffer: newBuffer,
-      width: width,
-      height: height,
-      fileName: `${crypto.createHash("md5").update(newBuffer).digest("hex")}${extname}`,
-    }
+    item.buffer = newBuffer;
+    item.width = width;
+    item.height = height;
+    item.fileName = `${crypto.createHash("md5").update(newBuffer).digest("hex")}${item.extname}`;
     // update the buffer
     console.log(`Compress image ${item.fileName} success`);
     return item;
@@ -117,6 +115,15 @@ class NotionMigrater extends Migrater.default {
           else {
             imgInfo = await this.handlePicFromLocal(picPath, url);
           }
+          // get pic uuid from the url using regex
+          const uuidreg = /[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}/;
+          const id = uuidreg.exec(url);
+          // if the url is a notion url
+          if (id) {
+            imgInfo.uuid = id[0];
+            // 文件重命名为notion url中的id
+            imgInfo.fileName = `${imgInfo.uuid}${imgInfo.extname}`;
+          }
           resolve(imgInfo);
         }
         catch (err) {
@@ -157,9 +164,8 @@ class NotionMigrater extends Migrater.default {
     // compress the image if the config is set
     if (this.ctx.getConfig('compress')) {
       toUploadImgs = await Promise.all(toUploadImgs.map(async (item) => {
-        var item_compressed = await compressPic(item.buffer, item.extname);
-        item_compressed.origin = item.origin;
-        return item_compressed;
+        await compressPic(item);
+        return item;
       }));
     }
     // filter the image again if the base_url is set
