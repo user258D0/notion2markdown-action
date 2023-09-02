@@ -338,11 +338,33 @@ async function embed(block) {
     return `<div style="width: 100%; margin: 0 0 2px;">${iframe}${caption_div}</div>`
 }
 
+async function image(block) {
+    let blockContent = block.image;
+    let image_title = "";
+    const image_caption_plain = blockContent.caption
+        .map((item) => item.plain_text)
+        .join("");
+    const image_type = blockContent.type;
+    let link = "";
+    if (image_type === "external") {
+        link = blockContent.external.url;
+    }
+    if (image_type === "file") {
+        link = blockContent.file.url;
+    }
+    // image caption with high priority
+    if (image_caption_plain.trim().length > 0) {
+        image_title = image_caption_plain;
+    }
+    return `![${image_title}](${link})`;
+}
+
 module.exports = {
     bookmark,
     link_preview,
     video,
     audio,
     embed,
-    pdf
+    pdf,
+    image
 }

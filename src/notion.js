@@ -79,6 +79,7 @@ function init(conf) {
   n2m.setCustomTransformer("link_preview", t.link_preview);
   n2m.setCustomTransformer("pdf", t.pdf);
   n2m.setCustomTransformer("audio", t.audio);
+  n2m.setCustomTransformer("image",t.image);
 }
 
 async function sync() {
