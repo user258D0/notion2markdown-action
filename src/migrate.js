@@ -111,14 +111,15 @@ class NotionMigrater extends Migrater.default {
     // check the url if it is already uploaded, if base_url is set
     if (base_url) {
       // filter the url include uuid and extname, to check the existence
-      const uuidreg = /[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}/;
+      const uuidreg = /[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}/g;
       const toCheckURLs = toUploadURLs.filter(url => {
-        const id = uuidreg.exec(url)?.[0];
+        const id = url.match(uuidreg)?.pop();
+        // const id = uuidreg.exec(url)?.pop();
         var extname = url.split('?')[0].split('.').pop()?.toLowerCase();
         return id && extname;
       });
       const existsImgs = await checkPicUrlList(toCheckURLs.map(url => {
-        const id = uuidreg.exec(url)?.[0];
+        const id = url.match(uuidreg)?.pop();
         var extname = url.split('?')[0].split('.').pop()?.toLowerCase();
         return `${base_url}${id}.${extname}`;
       }));
@@ -148,7 +149,7 @@ class NotionMigrater extends Migrater.default {
           imgInfo = await this.handlePicFromURL(url);
           // get pic uuid from the url using regex
           const uuidreg = /[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}/;
-          const id = uuidreg.exec(url)?.[0];
+          const id = url.match(uuidreg)?.pop();
           var extname = url.split('?')[0].split('.').pop()?.toLowerCase();
           // if the url is a notion url
           if (id && extname) {
