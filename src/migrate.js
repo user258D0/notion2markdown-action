@@ -148,7 +148,7 @@ class NotionMigrater extends Migrater.default {
         if (!picPath) {
           imgInfo = await this.handlePicFromURL(url);
           // get pic uuid from the url using regex
-          const uuidreg = /[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}/;
+          const uuidreg = /[a-fA-F0-9]{8}-(?:[a-fA-F0-9]{4}-){3}[a-fA-F0-9]{12}/g;
           const id = url.match(uuidreg)?.pop();
           var extname = url.split('?')[0].split('.').pop()?.toLowerCase();
           // if the url is a notion url
