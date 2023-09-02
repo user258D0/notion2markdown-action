@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-12 18:38:51 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-04-19 18:48:19 +02:00
+ * @LastEditTime: 2023-09-02 11:13:18 +08:00
  * @FilePath: \src\notion.js
  * @Description: 
  * 
@@ -60,7 +60,7 @@ function init(conf) {
     "picBed": config.picBed,
     "picgo-plugin-pic-migrater": {
       // only include notion image
-      include: `^(https://.*?/secure\.notion-static\.com\/.+\.(?:jpg|jpeg|png|gif|webp)\?.+)`, 
+      include: `^(https://.*?amazonaws\.com\/.+\.(?:jpg|jpeg|png|gif|webp)\?.+)`, 
       exclude: `^(?=.*${domain.replace('.', '\.')}).*|.*\.ico$`, // exclude the domain and icon
     },
     "pic-base-url": config.pic_base_url || null
