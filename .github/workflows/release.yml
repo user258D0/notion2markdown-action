@@ -3,7 +3,7 @@ name: Build a release for new tag
 on:
   push:
     branches:
-      - output
+      - dist
 
 permissions:
   contents: write
