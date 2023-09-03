@@ -32,11 +32,10 @@ jobs:
           rm dist -rf
           npm run build
       - name: Commit & Push
-        uses: action-x/commit@v2.9
+        uses: stefanzweifel/git-auto-commit-action@v4
         with:
-          github-token: ${{ secrets.GITHUB_TOKEN }}
-          push-branch: 'dist'
-          force-push: 'true'
-          commit-message: 'Generate dist files'
-          name: github-actions[bot]
-          email: github-actions[bot]@noreply.github.com
+          file_pattern: 'dist/*'
+          commit_message: Generate dist files.
+          branch: dist
+          create_branch: true
+          push_options: '--force'
