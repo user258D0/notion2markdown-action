@@ -1,0 +1,27 @@
+name: Build a release for new tag
+
+on:
+  push:
+    branches:
+      - output
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Ubuntu and node ${{ matrix.node_version }} and ${{ matrix.os }}
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        os: [ubuntu-latest]
+        node_version: [16.x]
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2
+      - name: Create release
+        uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          prerelease: false
+          automatic_release_tag: latest
