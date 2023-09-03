@@ -23,6 +23,12 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node_version }}
+      - name: Install dependencies
+        run: |
+          npm install
+          npm i -g @zeit/ncc
+      - name: Build ncc
+        run: npm run build
       - name: Create release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:

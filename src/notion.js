@@ -2,7 +2,7 @@
  * @Author: Dorad, ddxi@qq.com
  * @Date: 2023-04-12 18:38:51 +02:00
  * @LastEditors: Dorad, ddxi@qq.com
- * @LastEditTime: 2023-09-02 11:13:18 +08:00
+ * @LastEditTime: 2023-09-03 15:14:33 +08:00
  * @FilePath: \src\notion.js
  * @Description: 
  * 
@@ -16,7 +16,8 @@ const { getBlockChildren } = require("notion-to-md/build/utils/notion");
 const YAML = require("yaml");
 const { PicGo } = require("picgo");
 const path = require("path");
-const Migrater = require("./migrate");
+const { migrateNotionImageFromURL } = require("./migrateNotionImage")
+// const Migrater = require("./migrate");
 const { format } = require("prettier");
 const moment = require('moment-timezone');
 const t = require('./customTransformer');
@@ -69,6 +70,9 @@ function init(conf) {
   picgo_config["compress"] = config.pic_compress ? true : false;
 
   picgo.setConfig(picgo_config);
+  picgo.setConfig({
+    'picBed.transformer': 'base64'
+  });
 
   // passing notion client to the option
   n2m = new NotionToMarkdown({ notionClient: notion });
@@ -204,13 +208,13 @@ async function sync() {
     // get the latest properties of the page
     const newPageProp = await getPropertiesDict(page);
     await page2Markdown(page, prop.filePath, newPageProp);
-    if (config.migrate_image) {
-      const res = await migrateImages(prop.filePath);
-      if (!res) {
-        console.warn(`Migrate images failed: ${prop.id}, ${prop.title}`);
-        return false;
-      }
-    }
+    // if (config.migrate_image) {
+    //   const res = await migrateImages(prop.filePath);
+    //   if (!res) {
+    //     console.warn(`Migrate images failed: ${prop.id}, ${prop.title}`);
+    //     return false;
+    //   }
+    // }
     // update the page status to published
     await updatePageProperties(page);
     console.log(`Page conversion successfully: ${prop.id}, ${prop.title}`);
@@ -228,29 +232,35 @@ async function sync() {
 
 async function page2Markdown(page, filePath, properties) {
   const mdblocks = await n2m.pageToMarkdown(page.id);
+  // 将图床上传和URL替换放到这里，避免后续对于MD文件的二次处理.
+  if(config.migrate_image){
+    // 筛选出所有type为imge的block，并进行处理
+    let imgBlocks = mdblocks.filter((block) => block.type === "image");
+    // 对于所有的图片block，进行并行处理
+    await Promise.all(imgBlocks.map(async (block) => {
+      const mdImageReg = /!\[([^[\]]*)]\(([^)]+)\)/;
+      if(!mdImageReg.test(block.parent)) return;
+      const match = mdImageReg.exec(block.parent);
+      const newPicUrl = await migrateNotionImageFromURL(picgo, match[2]);
+      if (newPicUrl) {
+        block.parent = `![${match[1]}](${newPicUrl})`;
+      }
+      return block;
+    }));
+    // 处理封面图
+    if(page.cover && page.cover.type === "file"){
+      const newPicUrl = await migrateNotionImageFromURL(picgo, page.cover.file.url);
+      if (newPicUrl) {
+        properties.cover = newPicUrl;
+      }
+    }
+  }
+  // 转换为markdown
   let md = n2m.toMarkdownString(mdblocks).parent;
   fm = YAML.stringify(properties, { doubleQuotedAsJSON: true });
   // check if the file already exists
   md = format(`---\n${fm}---\n\n${md}`, { parser: "markdown" });
   writeFileSync(filePath, md);
-}
-
-/**
- * migrate images of the markdown file to tcyun
- * @param {*} file 
- */
-async function migrateImages(file) {
-  console.log(`[Image migrate]Handling file: ${file}`)
-  let res = await Migrater(picgo, [file]);
-  if (!res) {
-    console.error(`[Image migrate]File migrate img fail: ${file}`)
-    return false;
-  };
-  if (res.success != res.total) {
-    console.error(`file migrate img fail, total: ${res.total}, success: ${res.success}`)
-    return false;
-  }
-  return true;
 }
 
 /**
