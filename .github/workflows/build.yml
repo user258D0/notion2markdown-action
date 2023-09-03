@@ -26,9 +26,10 @@ jobs:
       - name: Install dependencies
         run: |
           npm install
-          npm i -g @zeit/ncc
+          npm i -g @vercel/ncc
       - name: Build ncc
-        run: npm run build
+        run: |
+          npm run build
       - name: Create release
         uses: "marvinpinto/action-automatic-releases@latest"
         with:
